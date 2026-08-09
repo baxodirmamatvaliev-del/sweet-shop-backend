@@ -42,7 +42,6 @@ productController.createProduct = async (req: Request, res: Response) => {
   }
 };
 
-// Mahsulotni yangilash: PUT /products/:id
 productController.updateProduct = async (req: Request, res: Response) => {
   try {
     console.log("updateProduct");
