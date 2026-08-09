@@ -1,4 +1,4 @@
-import ProductModel from "../models/Product.model";
+import ProductModel from "../schema/Product.model";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { shapeIntoMongooseObjectId } from "../libs/config";
 
@@ -49,7 +49,7 @@ class ProductService {
     const result = await this.productModel
       .findByIdAndUpdate(id, input, { new: true })
       .exec();
-      
+
     if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
     return result;
   }
