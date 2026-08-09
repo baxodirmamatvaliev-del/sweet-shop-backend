@@ -13,6 +13,9 @@ export enum Message {
   CREATE_FAILED = "Yaratish muvaffaqiyatsiz tugadi!",
   UPDATE_FAILED = "Yangilash muvaffaqiyatsiz tugadi!",
   USED_PRODUCT_NAME = "Bu mahsulot nomi allaqachon band!",
+  USED_NICK_PHONE = "USED_NICK_PHONE",
+  NO_MEMBER_NICK = "NO_MEMBER_NICK",
+  WRONG_PASSWORD = "WRONG_PASSWORD",
 }
 
 class Errors extends Error {
