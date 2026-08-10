@@ -21,15 +21,20 @@ memberController.signup = async (req: Request, res: Response) => { //
 };
 
 //  members login bu yerda ham shunday login Authentication boladi 
-memberController.login = async (req: Request, res: Response) => { //login qilishi uchun nputni DB dan tekshiramiz 
+memberController.login = async (req: Request, res: Response) => {
   try {
     console.log("login");
 
-    const result = await memberService.login(req.body); //kelgan datani DB dan tekshiramiz natijani result ga beramiz
-    res.status(200).json({ data: result }); // bu yerda ham shu natijani json ga aylantiramzi
+    const { member, token } = await memberService.login(req.body); //kelgan datani DB da tekshiramiz togri bosa member , token ga saqlamz
+    res.cookie("accessToken", token, {
+      maxAge: 24 * 60 * 60 * 1000,
+      httpOnly: true, // buni faqat server oqishi mumkin, client oqiy olmaydi, hafsiz qildik 
+
+    });
+    res.status(200).json({ data: member }); // natijani json daa qaytaramz
 
   } catch (err: any) {
-
+    
     console.error("ERROR, login", err);
     res.status(err.code || 500).json({ message: err.message || "Server xatosi" });
   }

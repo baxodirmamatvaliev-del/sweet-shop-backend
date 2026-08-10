@@ -1,5 +1,6 @@
 import { Router } from "express";
 import productController from "../controllers/Product.controller";
+import { verifyAuth } from "../middlewares/auth.middleware";
 
 const productRouter = Router();
 
@@ -13,6 +14,6 @@ productRouter
 
 // yangi mahsulot yaratish
 productRouter
-.post("/", productController.createProduct);
+.post("/", verifyAuth, productController.createProduct); 
 
 export default productRouter;
