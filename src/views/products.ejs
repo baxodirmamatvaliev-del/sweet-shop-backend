@@ -1,0 +1,31 @@
+x<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <title>Sweet Shop Admin - Mahsulotlar</title>
+</head>
+<body>
+  <h1>Mahsulotlar ro'yxati</h1>
+
+  <table border="1" cellpadding="10">
+    <thead>
+      <tr>
+        <th>Nomi</th>
+        <th>Kategoriya</th>
+        <th>Narxi</th>
+        <th>Ko'rishlar</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% products.forEach(function(product) { %>
+        <tr>
+          <td><%= product.productName %></td>
+          <td><%= product.productCategory %></td>
+          <td><%= product.productPrice %> so'm</td>
+          <td><%= product.productViews %></td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</body>
+</html>

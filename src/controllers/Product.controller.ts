@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import ProductService from "../services/Product.service";
+import { HttpCode, Message } from "../libs/Errors";
+import Errors from "../libs/Errors";
 
 const productService = new ProductService();
 
@@ -13,7 +15,7 @@ productController.getProducts = async (req: Request, res: Response) => {
     res.status(200).json({ data: result });
   } catch (err: any) {
     console.error("ERROR, getProducts", err);
-    res.status(err.code || 500).json({ message: err.message || "Server xatosi" });
+    throw new Errors(HttpCode.BAD_REQUEST, Message.ERROR_SERVICE);
   }
 };
 
@@ -26,7 +28,7 @@ productController.getProduct = async (req: Request, res: Response) => {
     res.status(200).json({ data: result });
   } catch (err: any) {
     console.error("ERROR, getProduct", err);
-    res.status(err.code || 500).json({ message: err.message || "Server xatosi" });
+     throw new Errors(HttpCode.BAD_REQUEST, Message.ERROR_SERVICE);
   }
 };
 
@@ -38,7 +40,7 @@ productController.createProduct = async (req: Request, res: Response) => {
     res.status(201).json({ data: result });
   } catch (err: any) {
     console.error("ERROR, createProduct", err);
-    res.status(err.code || 500).json({ message: err.message || "Server xatosi" });
+      throw new Errors(HttpCode.BAD_REQUEST, Message.ERROR_SERVICE);
   }
 };
 
