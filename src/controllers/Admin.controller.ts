@@ -30,4 +30,19 @@ adminController.updateProductStatus = async (req: Request, res: Response) => {
   }
 };
 
+// Yangi mahsulot yaratish (forma + rasm)
+adminController.processCreateProduct = async (req: Request, res: Response) => {
+  try {
+    const input = req.body;
+    if (req.file) {
+      input.productImage = req.file.filename;
+    }
+    await productService.createProduct(input);
+    res.redirect("/admin/products");
+  } catch (err) {
+    console.error("ERROR, processCreateProduct", err);
+    res.status(500).send("Error creating product!");
+  }
+};
+
 export default adminController;

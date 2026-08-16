@@ -176,3 +176,11 @@ label {
 .dropdown-menu button:hover {
   background-color: #f2f2f2;
 }
+
+/* rasim size */
+.product-thumb {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+}
