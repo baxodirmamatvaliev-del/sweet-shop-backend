@@ -9,7 +9,7 @@ class ProductService {
     this.productModel = ProductModel;
   }
 
-  public async getProducts(): Promise<any[]> {
+  public async getProducts(): Promise<any[]> { 
 
     const result = await this.productModel.find({}).exec();
 
