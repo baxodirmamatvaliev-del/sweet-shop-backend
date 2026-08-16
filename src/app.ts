@@ -9,6 +9,7 @@ import adminRouter from "./routes/Admin.route";
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); 
 app.use(cookieParser());
 app.use(morgan(MORGAN_FORMAT));
 app.use("/admin", adminRouter);
@@ -16,7 +17,7 @@ app.use("/admin", adminRouter);
 app.set("view engine", "ejs");
 app.set("views", "src/views");
 app.use(express.static("public"));
-app.use(express.urlencoded({ extended: true })); 
+
 
 app.get("/", (req, res) => {
   res.send("Salom, Sweet Shop backend ishlayapti! 🧁");

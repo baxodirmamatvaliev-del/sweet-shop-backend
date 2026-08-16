@@ -32,7 +32,7 @@ class MemberService {
     .findOne({ memberNick: input.memberNick })
     .select("+memberPassword")
     .exec();
-
+  console.log("FOUND MEMBER:", member);
   if (!member) {
     throw new Errors(HttpCode.NOT_FOUND, Message.NO_MEMBER_NICK);
   }

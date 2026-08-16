@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import ProductService from "../services/Product.service";
 import Errors, { HttpCode, Message } from "../libs/Errors";
+import MemberService from "../services/Member.service";
+
+const memberService = new MemberService();
 
 const productService = new ProductService();
 
@@ -26,7 +29,7 @@ adminController.updateProductStatus = async (req: Request, res: Response) => {
     res.redirect("/admin/products");
   } catch (err) {
     console.error("ERROR, updateProductStatus", err);
-    res.status(500).send("Statusni o'zgartirishda xatolik");
+    res.status(500).send("Error! changing status");
   }
 };
 
@@ -41,7 +44,25 @@ adminController.processCreateProduct = async (req: Request, res: Response) => {
     res.redirect("/admin/products");
   } catch (err) {
     console.error("ERROR, processCreateProduct", err);
-    res.status(500).send("Error creating product!");
+    res.status(500).send("Error! creating product!");
+  }
+};
+
+adminController.getLoginPage = (req: Request, res: Response) => {
+  res.render("login", { error: null });
+};
+
+adminController.processLogin = async (req: Request, res: Response) => {
+  try {
+    const { member, token } = await memberService.login(req.body);
+    res.cookie("accessToken", token, {
+      maxAge: 24 * 60 * 60 * 1000,
+      httpOnly: true,
+    });
+    res.redirect("/admin/products");
+  } catch (err) {
+    console.error("ERROR, processLogin", err);
+    res.render("login", { error: "Incorrect login or password" });
   }
 };
 
