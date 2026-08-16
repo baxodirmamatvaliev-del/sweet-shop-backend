@@ -12,7 +12,7 @@ const ProductSchema = new Schema(
     productStatus: {
       type: String,
       enum: ProductStatus,
-      default: ProductStatus.ACTIVE,
+      default: ProductStatus.PROCESS,
     },
 
     productName: {

@@ -1,3 +1,8 @@
+* {
+  box-sizing: border-box;
+}
+
+
 body {
   font-family: Arial, sans-serif;
   background-color: #fdf6f0;
@@ -38,4 +43,136 @@ th {
 
 tr:hover {
   background-color: #f9f1e7;
+}
+
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+button:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+
+.btn-primary {
+  background-color: #7b3f00;
+  color: white;
+}
+
+
+.btn-create {
+  background-color: #2e7d32;
+  color: white;
+}
+
+
+.btn-cancel {
+  background-color: #c62828;
+  color: white;
+}
+
+
+.btn-status {
+  background-color: #444;
+  color: white;
+  padding: 6px 12px;
+  font-size: 12px;
+  margin-right: 4px;
+}
+
+
+#createForm {
+  background-color: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  max-width: 500px;
+}
+
+
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  padding: 8px 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+label {
+  font-weight: bold;
+  color: #333;
+}
+
+
+.button-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+}
+
+
+#createForm {
+  max-width: 100%;
+  width: 100%;
+}
+
+
+/* Status  */
+
+
+.status-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.btn-status-toggle {
+  background-color: #444;
+  color: white;
+  padding: 8px 14px;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  z-index: 10;
+  min-width: 140px;
+}
+
+.dropdown-menu form {
+  margin: 0;
+}
+
+.dropdown-menu button {
+  width: 100%;
+  text-align: left;
+  background: none;
+  color: #333;
+  padding: 10px 14px;
+  border-radius: 0;
+  font-weight: normal;
+}
+
+.dropdown-menu button:hover {
+  background-color: #f2f2f2;
 }

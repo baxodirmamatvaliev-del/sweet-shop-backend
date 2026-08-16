@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <title>Yangi mahsulot qo'shish</title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Yangi mahsulot qo'shish</h1>
+
+    <form action="/admin/products/create" method="POST">
+      <label>Mahsulot nomi:</label><br>
+      <input type="text" name="productName" required><br><br>
+
+      <label>Kategoriya:</label><br>
+      <select name="productCategory" required>
+        <option value="CUPCAKE">CUPCAKE</option>
+        <option value="CAKE">CAKE</option>
+        <option value="COOKIE">COOKIE</option>
+        <option value="OTHER">OTHER</option>
+      </select><br><br>
+
+      <label>Narxi:</label><br>
+      <input type="number" name="productPrice" required><br><br>
+
+      <label>Tavsif:</label><br>
+      <textarea name="productDesc"></textarea><br><br>
+
+      <button type="submit">Qo'shish</button>
+    </form>
+
+    <a href="/admin/products">← Ro'yxatga qaytish</a>
+  </div>
+</body>
+</html>

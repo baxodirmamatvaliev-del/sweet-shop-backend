@@ -49,10 +49,20 @@ class ProductService {
     const result = await this.productModel
       .findByIdAndUpdate(id, input, { new: true })
       .exec();
-
     if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
     return result;
   }
+
+  public async updateProductStatus(productId: string, status: string): Promise<any> { // faqat STATUS orgartirish uchun method 
+
+  const id = shapeIntoMongooseObjectId(productId);
+  const result = await this.productModel
+    .findByIdAndUpdate(id, { productStatus: status }, { returnDocument: "after" })
+    .exec();
+  if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
+  return result;
+
+}
 }
 
 export default ProductService;

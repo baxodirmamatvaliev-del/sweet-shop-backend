@@ -6,7 +6,8 @@ export enum ProductCategory {
 }
 
 export enum ProductStatus {
-  ACTIVE = "ACTIVE",
+  PROCESS = "PROCESS",
+  PAUSE = "PAUSE",
   SOLD_OUT = "SOLD_OUT",
   DELETE = "DELETE",
 }

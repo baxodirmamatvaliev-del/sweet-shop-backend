@@ -16,19 +16,86 @@
           <th>Kategoriya</th>
           <th>Narxi</th>
           <th>Ko'rishlar</th>
+          <th>Status</th>
+          <th>Amallar</th>
         </tr>
       </thead>
       <tbody>
-        <% products.forEach(function(product) { %>
-          <tr>
-            <td><%= product.productName %></td>
-            <td><%= product.productCategory %></td>
-            <td><%= product.productPrice %> so'm</td>
-            <td><%= product.productViews %></td>
-          </tr>
-        <% }); %>
-      </tbody>
+  <% products.forEach(function(product) { %>
+    <tr>
+      <td><%= product.productName %></td>
+      <td><%= product.productCategory %></td>
+      <td><%= product.productPrice %> so'm</td>
+      <td><%= product.productViews %></td>
+      <td><%= product.productStatus %></td>
+      <td>
+        <div class="status-dropdown">
+          <button type="button" class="btn-status-toggle" onclick="toggleDropdown('dropdown-<%= product._id %>')">Status ▾</button>
+          <div id="dropdown-<%= product._id %>" class="dropdown-menu">
+            <form action="/admin/products/<%= product._id %>/status" method="POST">
+              <input type="hidden" name="status" value="PROCESS">
+              <button type="submit">Faollashtirish</button>
+            </form>
+            <form action="/admin/products/<%= product._id %>/status" method="POST">
+              <input type="hidden" name="status" value="PAUSE">
+              <button type="submit">Pauza</button>
+            </form>
+            <form action="/admin/products/<%= product._id %>/status" method="POST">
+              <input type="hidden" name="status" value="SOLD_OUT">
+              <button type="submit">Tugagan</button>
+            </form>
+            <form action="/admin/products/<%= product._id %>/status" method="POST">
+              <input type="hidden" name="status" value="DELETE">
+              <button type="submit">O'chirish</button>
+            </form>
+          </div>
+        </div>
+      </td>
+    </tr>
+  <% }); %>
+</tbody>
     </table>
+
+    <!-- ⬇️  -->
+
+    <div class="button-row">
+  <button class="btn-primary" onclick="toggleForm()">New Product button🛎️</button></div>
+
+    <div id="createForm" style="display:none;">
+      <form action="/admin/products/create" method="POST" enctype="multipart/form-data">
+        <label>Nomi:</label>
+        <input type="text" name="productName" required>
+
+        <label>Narxi:</label>
+        <input type="number" name="productPrice" required>
+
+        <label>Kategoriya:</label>
+        <select name="productCategory">
+          <option value="CUPCAKE">CUPCAKE</option>
+          <option value="CAKE">CAKE</option>
+          <option value="COOKIE">COOKIE</option>
+          <option value="OTHER">OTHER</option>
+        </select>
+
+        <label>Tavsif:</label>
+        <textarea name="productDesc"></textarea>
+
+        <label>Rasm:</label>
+        <input type="file" name="productImage">
+
+        <br><br>
+        <button type="submit" class="btn-create">Create</button>
+        <button type="button" class="btn-cancel" onclick="toggleForm()">Cancel</button>
+      </form>
+    </div>
+    <!-- ⬆️ -->
   </div>
+
+  <script>
+    function toggleForm() {
+      const form = document.getElementById("createForm");
+      form.style.display = form.style.display === "none" ? "block" : "none";
+    }
+  </script>
 </body>
 </html>
