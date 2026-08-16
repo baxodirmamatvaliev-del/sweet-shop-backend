@@ -317,3 +317,44 @@ body.login-page {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0,0,0,0.3);
 }
+
+body.admin-page {
+  margin: 0;
+  min-height: 100vh;
+  position: relative;
+  background: linear-gradient(-45deg, #fdf6f0, #ffe4c4, #fdf6f0, #f7d9b0);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  overflow-x: hidden;
+  padding: 30px;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.floating-sweet {
+  position: fixed;
+  font-size: 50px;
+  opacity: 0.25;
+  z-index: 0;
+  animation: floatSweet 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.floating-sweet { top: 8%; left: 5%; }
+.fs2 { top: 65%; left: 90%; animation-delay: 2s; }
+.fs3 { top: 20%; left: 85%; animation-delay: 4s; }
+.fs4 { top: 75%; left: 8%; animation-delay: 6s; }
+
+@keyframes floatSweet {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-25px) rotate(10deg); }
+}
+
+body.admin-page .container {
+  position: relative;
+  z-index: 1;
+}
