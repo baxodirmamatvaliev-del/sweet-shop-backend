@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import MemberService from "../services/Member.service";
 import Errors, { HttpCode, Message } from "../libs/Errors";
+import { MemberType } from "../libs/enums/member.enum";
 
 const memberService = new MemberService();
 const memberController: any = {};
@@ -9,7 +10,15 @@ const memberController: any = {};
 memberController.signup = async (req: Request, res: Response) => { //
   try {
     console.log("signup");
-    const result = await memberService.signup(req.body);
+    const { memberNick, memberPhone, memberPassword, memberAddress, memberDesc } = req.body;
+    const result = await memberService.signup({
+      memberNick,
+      memberPhone,
+      memberPassword,
+      memberAddress,
+      memberDesc,
+      memberType: MemberType.USER,
+    });
     res.status(201).json({ data: result });
 
   } catch (err: any) {

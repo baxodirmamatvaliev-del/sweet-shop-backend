@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create account | Sweet Shop</title>
+  <link rel="stylesheet" href="/css/signup.css">
+  <script src="/js/signup.js" defer></script>
+</head>
+<body>
+  <main class="signup-page">
+    <section class="signup-intro" aria-label="Sweet Shop introduction">
+      <a class="brand" href="/admin/login">🧁 <span>Sweet Shop</span></a>
+      <div class="intro-content">
+        <p class="intro-eyebrow">A little sweeter every day</p>
+        <h1>Create your Sweet Shop account.</h1>
+        <p>Save your details now and be ready for a delightful shopping experience.</p>
+      </div>
+      <div class="sweet-decoration decoration-cake">🍰</div>
+      <div class="sweet-decoration decoration-cookie">🍪</div>
+      <p class="intro-note">Administrator access is private and cannot be requested through this form.</p>
+    </section>
+
+    <section class="signup-panel">
+      <div class="signup-card">
+        <a class="back-link" href="/admin/login"><span aria-hidden="true">←</span> Back to sign in</a>
+        <p class="card-eyebrow">Welcome</p>
+        <h2>Join Sweet Shop</h2>
+        <p class="card-description">Fill in your details to create a customer account.</p>
+
+        <% if (error) { %>
+          <p class="signup-alert" role="alert"><%= error %></p>
+        <% } %>
+
+        <form id="signupForm" action="/admin/signup" method="POST" novalidate>
+          <div class="field-group">
+            <label for="memberNick">Username</label>
+            <input id="memberNick" name="memberNick" type="text" autocomplete="username" minlength="3" placeholder="Username" required>
+          </div>
+
+          <div class="field-group">
+            <label for="memberPhone">Phone number</label>
+            <input id="memberPhone" name="memberPhone" type="tel" autocomplete="tel" placeholder="+82-10 1234 5678" required>
+          </div>
+
+          <div class="field-group">
+            <label for="memberAddress">Address <span>Optional</span></label>
+            <input id="memberAddress" name="memberAddress" type="text" autocomplete="street-address" placeholder="Your city or address">
+          </div>
+
+          <div class="field-group">
+            <label for="memberPassword">Password</label>
+            <div class="password-field">
+              <input id="memberPassword" name="memberPassword" type="password" autocomplete="new-password" minlength="6" placeholder="At least 6 characters" required>
+              <button class="password-toggle" type="button" data-password-toggle="memberPassword" aria-label="Show password">Show</button>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="confirmPassword">Confirm password</label>
+            <div class="password-field">
+              <input id="confirmPassword" type="password" autocomplete="new-password" placeholder="Repeat your password" required>
+              <button class="password-toggle" type="button" data-password-toggle="confirmPassword" aria-label="Show password">Show</button>
+            </div>
+          </div>
+
+          <p id="formMessage" class="form-message" aria-live="polite"></p>
+          <button class="signup-submit" type="submit">Create account <span aria-hidden="true">→</span></button>
+        </form>
+
+        <p class="signin-link">Already have an account? <a href="/admin/login">Sign in</a></p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

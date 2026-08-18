@@ -276,6 +276,36 @@ body.login-page {
   text-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
+.form-alert {
+  margin: 0 0 18px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.form-alert-error {
+  background: rgba(255, 225, 225, 0.92);
+  color: #9d1e1e;
+}
+
+.form-alert-success {
+  background: rgba(218, 245, 222, 0.92);
+  color: #176b32;
+}
+
+.login-signup-link {
+  margin: 22px 0 0;
+  color: #fff0df;
+  font-size: 14px;
+  text-align: center;
+}
+
+.login-signup-link a {
+  color: #ffd08a;
+  font-weight: 800;
+}
+
 .login-box label {
   display: block;
   margin-top: 15px;

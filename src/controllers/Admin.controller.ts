@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import ProductService from "../services/Product.service";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import MemberService from "../services/Member.service";
+import { MemberType } from "../libs/enums/member.enum";
 
 const memberService = new MemberService();
 
@@ -73,12 +74,42 @@ adminController.processCreateProduct = async (req: Request, res: Response) => {
 };
 
 adminController.getLoginPage = (req: Request, res: Response) => {
-  res.render("login", { error: null });
+  res.render("login", { error: null, registered: req.query.registered === "true" });
+};
+
+adminController.getSignupPage = (req: Request, res: Response) => {
+  res.render("signup", { error: null });
+};
+
+
+adminController.processSignup = async (req: Request, res: Response) => {
+  try {
+    const { memberNick, memberPhone, memberPassword, memberAddress, memberDesc } = req.body;
+
+    await memberService.signup({
+      memberNick,
+      memberPhone,
+      memberPassword,
+      memberAddress,
+      memberDesc,
+      memberType: MemberType.USER,
+    });
+
+    res.redirect("/admin/login?registered=true");
+  } catch (err) {
+    console.error("ERROR, processSignup", err);
+    res.render("signup", { error: "Unable to create your account. The username or phone number may already be in use." });
+  }
 };
 
 adminController.processLogin = async (req: Request, res: Response) => {
   try {
     const { member, token } = await memberService.login(req.body);
+
+    if (member.memberType !== MemberType.ADMIN) {
+      return res.render("login", { error: "This area is restricted to administrators." });
+    }
+
     res.cookie("accessToken", token, {
       maxAge: 24 * 60 * 60 * 1000,
       httpOnly: true,

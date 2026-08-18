@@ -8,6 +8,8 @@ const adminRouter = Router();
 // Public login routes
 adminRouter.get("/login", adminController.getLoginPage);
 adminRouter.post("/login", adminController.processLogin);
+adminRouter.get("/signup", adminController.getSignupPage);
+adminRouter.post("/signup", adminController.processSignup);
 
 // Protected admin routes
 adminRouter.get("/products", verifyAdmin, adminController.getProductsPage);
