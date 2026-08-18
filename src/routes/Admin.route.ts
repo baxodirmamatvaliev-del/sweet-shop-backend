@@ -13,5 +13,8 @@ adminRouter.post("/login", adminController.processLogin);
 adminRouter.get("/products", verifyAdmin, adminController.getProductsPage);
 adminRouter.post("/products/:id/status", verifyAdmin, adminController.updateProductStatus);
 adminRouter.post("/products/create", verifyAdmin, uploader.single("productImage"), adminController.processCreateProduct);
+adminRouter.get("/users", verifyAdmin, adminController.getUsersPage);
+adminRouter.post("/users/:id/status", verifyAdmin, adminController.updateMemberStatus);
+adminRouter.post("/logout", verifyAdmin, adminController.logout);
 
 export default adminRouter;

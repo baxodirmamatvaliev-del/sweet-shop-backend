@@ -20,6 +20,30 @@ adminController.getProductsPage = async (req: Request, res: Response) => {
   }
 };
 
+// Admin panel: foydalanuvchilar ro'yxati
+adminController.getUsersPage = async (req: Request, res: Response) => {
+  try {
+    const members = await memberService.getMembers();
+    res.render("users", { members });
+  } catch (err) {
+    console.error("ERROR, getUsersPage", err);
+    res.status(500).send("Foydalanuvchilarni yuklashda xatolik yuz berdi.");
+  }
+};
+
+// Foydalanuvchi statusini o'zgartirish
+adminController.updateMemberStatus = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    await memberService.updateMemberStatus(id as string, status);
+    res.redirect("/admin/users");
+  } catch (err) {
+    console.error("ERROR, updateMemberStatus", err);
+    res.status(500).send("Foydalanuvchi statusini o'zgartirib bo'lmadi.");
+  }
+};
+
 // Mahsulot statusini o'zgartirish (pauza, tugagan, o'chirish)
 adminController.updateProductStatus = async (req: Request, res: Response) => {
   try {
@@ -64,6 +88,12 @@ adminController.processLogin = async (req: Request, res: Response) => {
     console.error("ERROR, processLogin", err);
     res.render("login", { error: "Incorrect login or password" });
   }
+};
+
+// Admin sessiyasini tugatish
+adminController.logout = (req: Request, res: Response) => {
+  res.clearCookie("accessToken", { httpOnly: true });
+  res.redirect("/admin/login");
 };
 
 export default adminController;

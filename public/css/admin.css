@@ -326,7 +326,8 @@ body.admin-page {
   background-size: 400% 400%;
   animation: gradientShift 15s ease infinite;
   overflow-x: hidden;
-  padding: 30px;
+  padding: 0;
+  display: block;
 }
 
 @keyframes gradientShift {
@@ -357,4 +358,260 @@ body.admin-page {
 body.admin-page .container {
   position: relative;
   z-index: 1;
+}
+
+.navbar {
+  width: min(calc(100% - 48px), 1440px);
+  height: 72px;
+  margin: 24px auto 0;
+  border-radius: 16px;
+  background: rgba(91, 54, 22, 0.94);
+  padding: 0 32px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 12px 30px rgba(83, 45, 13, 0.16);
+}
+
+.navbar-brand {
+  color: #fff8ef;
+  font-size: 21px;
+  font-weight: bold;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-links a {
+  color: #fff3e3;
+  text-decoration: none;
+  font-weight: bold;
+  margin-left: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.navbar-links a:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.logout-form {
+  margin: 0;
+}
+
+.logout-button {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff3e3;
+  font-size: inherit;
+}
+
+.logout-button:hover {
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: none;
+}
+
+body.admin-page .products-page {
+  width: min(calc(100% - 48px), 1440px);
+  max-width: none;
+  margin: 28px auto 48px;
+}
+
+.page-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: #a85a18;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+body.admin-page h1 {
+  margin: 0;
+  color: #582c0b;
+  text-align: left;
+  font-size: clamp(28px, 4vw, 42px);
+}
+
+.page-description {
+  margin: 8px 0 0;
+  color: #765943;
+  font-size: 16px;
+}
+
+.add-product-button {
+  flex: 0 0 auto;
+}
+
+.button-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.table-card {
+  overflow: hidden;
+  background: #fffdf9;
+  border: 1px solid rgba(123, 63, 0, 0.14);
+  border-radius: 16px;
+  box-shadow: 0 14px 34px rgba(102, 58, 19, 0.12);
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+table.products-table {
+  width: 100%;
+  min-width: 940px;
+  margin: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.products-table th,
+.products-table td {
+  padding: 16px 18px;
+  vertical-align: middle;
+  border: 0;
+  border-bottom: 1px solid #f0e5da;
+}
+
+.products-table th {
+  background: #7b3f00;
+  white-space: nowrap;
+  font-size: 15px;
+}
+
+.products-table td {
+  color: #332319;
+}
+
+.products-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.products-table tbody tr:hover {
+  background: #fff5eb;
+}
+
+.products-table td:first-child {
+  min-width: 180px;
+  font-weight: 700;
+}
+
+.products-table td:nth-child(3),
+.products-table td:nth-child(4) {
+  white-space: nowrap;
+}
+
+.users-table td:first-child {
+  min-width: 145px;
+}
+
+.users-table td:nth-child(2),
+.users-table td:nth-child(6) {
+  white-space: nowrap;
+}
+
+.role-badge,
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.role-badge {
+  background: #f4e9df;
+  color: #764112;
+}
+
+.status-badge {
+  background: #f7eadc;
+  color: #8b4b11;
+}
+
+.status-active {
+  background: #def4e4;
+  color: #1f7136;
+}
+
+.status-block {
+  background: #fde3df;
+  color: #b42e24;
+}
+
+.status-delete {
+  background: #ece7e2;
+  color: #665c54;
+}
+
+.empty-table {
+  padding: 36px !important;
+  color: #765943 !important;
+  font-weight: 500 !important;
+  text-align: center !important;
+}
+
+.button-row {
+  margin-top: 20px;
+}
+
+#createForm {
+  margin-top: 20px;
+}
+
+@media (max-width: 640px) {
+  .navbar {
+    width: calc(100% - 28px);
+    height: auto;
+    min-height: 64px;
+    margin-top: 14px;
+    padding: 12px 16px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .navbar-links a {
+    padding: 6px 8px;
+    font-size: 14px;
+  }
+
+  .logout-button {
+    padding: 6px 8px;
+    font-size: 14px;
+  }
+
+  body.admin-page .products-page {
+    width: calc(100% - 28px);
+    margin-top: 24px;
+  }
+
+  .page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .add-product-button {
+    width: 100%;
+  }
 }

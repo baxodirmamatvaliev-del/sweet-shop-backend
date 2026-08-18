@@ -2,6 +2,7 @@ import MemberModel from "../schema/Member.model";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import * as bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { shapeIntoMongooseObjectId } from "../libs/config";
 
 class MemberService {
   private readonly memberModel;
@@ -53,6 +54,25 @@ class MemberService {
 
   return { member, token };
 }
+
+  public async getMembers(): Promise<any[]> {
+    return this.memberModel
+      .find({})
+      .select("memberNick memberPhone memberType memberStatus memberAddress createdAt")
+      .sort({ createdAt: -1 })
+      .exec();
+  }
+
+  public async updateMemberStatus(memberId: string, status: string): Promise<any> {
+    const id = shapeIntoMongooseObjectId(memberId);
+
+    const result = await this.memberModel
+      .findByIdAndUpdate(id, { memberStatus: status }, { new: true, runValidators: true })
+      .exec();
+
+    if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
+    return result;
+  }
 
 }
 

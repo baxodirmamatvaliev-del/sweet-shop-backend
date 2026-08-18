@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sweet Shop Admin - Foydalanuvchilar</title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-page">
+  <%- include('includes/header') %>
+
+  <div class="floating-sweet fs4">🍪</div>
+  <div class="floating-sweet fs2">🍰</div>
+  <div class="floating-sweet fs3">🎂</div>
+
+  <main class="container products-page">
+    <div class="page-heading">
+      <div>
+        <p class="eyebrow">Boshqaruv paneli</p>
+        <h1>Foydalanuvchilar</h1>
+        <p class="page-description">Ro‘yxatdan o‘tgan foydalanuvchilarni ko‘ring va statusini boshqaring.</p>
+      </div>
+      <a class="btn-primary add-product-button button-link" href="/admin/products">← Mahsulotlar</a>
+    </div>
+
+    <div class="table-card">
+      <div class="table-scroll">
+        <table class="products-table users-table">
+          <thead>
+            <tr>
+              <th>Foydalanuvchi</th>
+              <th>Telefon</th>
+              <th>Manzil</th>
+              <th>Roli</th>
+              <th>Status</th>
+              <th>Ro‘yxatdan o‘tgan sana</th>
+              <th>Amallar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (members.length === 0) { %>
+              <tr>
+                <td colspan="7" class="empty-table">Hozircha foydalanuvchilar mavjud emas.</td>
+              </tr>
+            <% } %>
+            <% members.forEach(function(member) { %>
+              <tr>
+                <td><%= member.memberNick %></td>
+                <td><%= member.memberPhone %></td>
+                <td><%= member.memberAddress || "—" %></td>
+                <td><span class="role-badge"><%= member.memberType %></span></td>
+                <td><span class="status-badge status-<%= member.memberStatus.toLowerCase() %>"><%= member.memberStatus %></span></td>
+                <td><%= new Date(member.createdAt).toLocaleDateString('uz-UZ') %></td>
+                <td>
+                  <div class="status-dropdown">
+                    <button type="button" class="btn-status-toggle" onclick="toggleDropdown('dropdown-<%= member._id %>')">Status ▾</button>
+                    <div id="dropdown-<%= member._id %>" class="dropdown-menu">
+                      <form action="/admin/users/<%= member._id %>/status" method="POST">
+                        <input type="hidden" name="status" value="ACTIVE">
+                        <button type="submit">Faollashtirish</button>
+                      </form>
+                      <form action="/admin/users/<%= member._id %>/status" method="POST">
+                        <input type="hidden" name="status" value="BLOCK">
+                        <button type="submit">Bloklash</button>
+                      </form>
+                      <form action="/admin/users/<%= member._id %>/status" method="POST">
+                        <input type="hidden" name="status" value="DELETE">
+                        <button type="submit">O‘chirilgan deb belgilash</button>
+                      </form>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function toggleDropdown(id) {
+      const menu = document.getElementById(id);
+      const isOpen = menu.style.display === "block";
+      document.querySelectorAll(".dropdown-menu").forEach(function(item) {
+        item.style.display = "none";
+      });
+      menu.style.display = isOpen ? "none" : "block";
+    }
+
+    document.addEventListener("click", function(event) {
+      if (!event.target.closest(".status-dropdown")) {
+        document.querySelectorAll(".dropdown-menu").forEach(function(item) {
+          item.style.display = "none";
+        });
+      }
+    });
+  </script>
+</body>
+</html>
