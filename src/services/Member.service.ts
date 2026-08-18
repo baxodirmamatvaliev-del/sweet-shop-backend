@@ -11,15 +11,15 @@ class MemberService {
     this.memberModel = MemberModel;
   }
 
-  // "signup" bolamiz Baxodir
+  // Create a new member account
   public async signup(input: any): Promise<any> {
 
-    const salt = await bcrypt.genSalt();  // paswordni hash qilamiz
+    const salt = await bcrypt.genSalt();
     input.memberPassword = await bcrypt.hash(input.memberPassword, salt);
 
     try {
-      const result = await this.memberModel.create(input); //inputni bazaga saqlaymiz
-      result.memberPassword = ""; //]
+      const result = await this.memberModel.create(input);
+      result.memberPassword = "";
       return result;
     } catch (err) {
       console.error("ERROR, model signup", err);
@@ -27,7 +27,7 @@ class MemberService {
     }
   }
 
-  //  "login" bolamiz 
+  // Authenticate a member
   public async login(input: any): Promise<any> {
   const member = await this.memberModel
     .findOne({ memberNick: input.memberNick })

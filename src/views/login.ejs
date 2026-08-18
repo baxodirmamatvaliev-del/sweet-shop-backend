@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sweet Shop Admin - Kirish</title>
+  <title>Sweet Shop Admin - Sign in</title>
   <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body class="login-page">
@@ -14,21 +14,21 @@
   <div class="overlay"></div>
 
   <div class="login-box">
-    <h1>Admin panelga kirish</h1>
+    <h1>Sign in to the admin panel</h1>
 
     <% if (error) { %>
       <p style="color:red;"><%= error %></p>
     <% } %>
 
     <form action="/admin/login" method="POST">
-      <label>Login:</label>
+      <label>Username:</label>
       <input type="text" name="memberNick" required>
 
-      <label>Parol:</label>
+      <label>Password:</label>
       <input type="password" name="memberPassword" required>
 
       <br><br>
-      <button type="submit" class="btn-create">Kirish</button>
+      <button type="submit" class="btn-create">Sign in</button>
     </form>
   </div>
 </body>

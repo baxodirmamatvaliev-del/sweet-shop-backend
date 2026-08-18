@@ -53,7 +53,8 @@ class ProductService {
     return result;
   }
 
-  public async updateProductStatus(productId: string, status: string): Promise<any> { // faqat STATUS orgartirish uchun method 
+  // Update only the product status
+  public async updateProductStatus(productId: string, status: string): Promise<any> {
 
   const id = shapeIntoMongooseObjectId(productId);
   const result = await this.productModel

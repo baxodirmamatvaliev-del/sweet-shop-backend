@@ -8,11 +8,11 @@ export enum HttpCode {
 }
 
 export enum Message {
-  SOMETHING_WENT_WRONG = "Nimadir xato ketdi!",
-  NO_DATA_FOUND = "Malumot topilmadi!",
-  CREATE_FAILED = "Yaratish muvaffaqiyatsiz tugadi!",
-  UPDATE_FAILED = "Yangilash muvaffaqiyatsiz tugadi!",
-  USED_PRODUCT_NAME = "Bu mahsulot nomi allaqachon band!",
+  SOMETHING_WENT_WRONG = "Something went wrong!",
+  NO_DATA_FOUND = "No data found!",
+  CREATE_FAILED = "Creation failed!",
+  UPDATE_FAILED = "Update failed!",
+  USED_PRODUCT_NAME = "This product name is already in use!",
   USED_NICK_PHONE = "USED_NICK_PHONE",
   NO_MEMBER_NICK = "NO_MEMBER_NICK",
   WRONG_PASSWORD = "WRONG_PASSWORD",

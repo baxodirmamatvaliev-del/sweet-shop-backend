@@ -20,7 +20,7 @@ app.use(express.static("public"));
 
 
 app.get("/", (req, res) => {
-  res.send("Salom, Sweet Shop backend ishlayapti! 🧁");
+  res.send("Sweet Shop backend is running! 🧁");
 });
 
 

@@ -9,7 +9,7 @@ const productService = new ProductService();
 
 const adminController: any = {};
 
-// Admin panel: mahsulotlar ro'yxati sahifasi
+// Admin panel: products page
 adminController.getProductsPage = async (req: Request, res: Response) => {
   try {
     const products = await productService.getProducts();
@@ -20,18 +20,18 @@ adminController.getProductsPage = async (req: Request, res: Response) => {
   }
 };
 
-// Admin panel: foydalanuvchilar ro'yxati
+// Admin panel: users page
 adminController.getUsersPage = async (req: Request, res: Response) => {
   try {
     const members = await memberService.getMembers();
     res.render("users", { members });
   } catch (err) {
     console.error("ERROR, getUsersPage", err);
-    res.status(500).send("Foydalanuvchilarni yuklashda xatolik yuz berdi.");
+    res.status(500).send("Unable to load users.");
   }
 };
 
-// Foydalanuvchi statusini o'zgartirish
+// Update a member's status
 adminController.updateMemberStatus = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -40,11 +40,11 @@ adminController.updateMemberStatus = async (req: Request, res: Response) => {
     res.redirect("/admin/users");
   } catch (err) {
     console.error("ERROR, updateMemberStatus", err);
-    res.status(500).send("Foydalanuvchi statusini o'zgartirib bo'lmadi.");
+    res.status(500).send("Unable to update the user's status.");
   }
 };
 
-// Mahsulot statusini o'zgartirish (pauza, tugagan, o'chirish)
+// Update product status (pause, sold out, delete)
 adminController.updateProductStatus = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -53,11 +53,11 @@ adminController.updateProductStatus = async (req: Request, res: Response) => {
     res.redirect("/admin/products");
   } catch (err) {
     console.error("ERROR, updateProductStatus", err);
-    res.status(500).send("Error! changing status");
+    res.status(500).send("Unable to update the product status.");
   }
 };
 
-// Yangi mahsulot yaratish (forma + rasm)
+// Create a product from the admin form
 adminController.processCreateProduct = async (req: Request, res: Response) => {
   try {
     const input = req.body;
@@ -68,7 +68,7 @@ adminController.processCreateProduct = async (req: Request, res: Response) => {
     res.redirect("/admin/products");
   } catch (err) {
     console.error("ERROR, processCreateProduct", err);
-    res.status(500).send("Error! creating product!");
+    res.status(500).send("Unable to create the product.");
   }
 };
 
@@ -90,7 +90,7 @@ adminController.processLogin = async (req: Request, res: Response) => {
   }
 };
 
-// Admin sessiyasini tugatish
+// End the admin session
 adminController.logout = (req: Request, res: Response) => {
   res.clearCookie("accessToken", { httpOnly: true });
   res.redirect("/admin/login");

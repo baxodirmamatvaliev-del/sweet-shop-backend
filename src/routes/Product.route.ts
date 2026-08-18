@@ -4,15 +4,15 @@ import { verifyAuth } from "../middlewares/auth.middleware";
 
 const productRouter = Router();
 
-// products hammasini  olish
+// Get all products
 productRouter
 .get("/", productController.getProducts);
 
-//  products/:id 1tadan  mahsulotini olish
+// Get one product by ID
 productRouter
 .get("/:id", productController.getProduct);
 
-// yangi mahsulot yaratish
+// Create a new product
 productRouter
 .post("/", verifyAuth, productController.createProduct); 
 

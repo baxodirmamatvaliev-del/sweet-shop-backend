@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sweet Shop Admin - Mahsulotlar</title>
+  <title>Sweet Shop Admin - Products</title>
   <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body class="admin-page">
@@ -18,11 +18,11 @@
   <main class="container products-page">
     <div class="page-heading">
       <div>
-        <p class="eyebrow">Boshqaruv paneli</p>
-        <h1>Mahsulotlar ro'yxati</h1>
-        <p class="page-description">Do‘kondagi mahsulotlarni ko‘ring va ularning holatini boshqaring.</p>
+        <p class="eyebrow">Admin panel</p>
+        <h1>Products</h1>
+        <p class="page-description">View store products and manage their availability.</p>
       </div>
-      <button class="btn-primary add-product-button" type="button" onclick="toggleForm()">+ Yangi mahsulot</button>
+      <button class="btn-primary add-product-button" type="button" onclick="toggleForm()">+ Add product</button>
     </div>
 
     <div class="table-card">
@@ -30,13 +30,13 @@
     <table class="products-table">
       <thead>
         <tr>
-          <th>Nomi</th>
-          <th>Kategoriya</th>
-          <th>Narxi</th>
-          <th>Ko'rishlar</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Views</th>
           <th>Status</th>
-          <th>Rasm</th>
-          <th>Amallar</th>
+          <th>Image</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -44,14 +44,14 @@
           <tr>
             <td><%= product.productName %></td>
             <td><%= product.productCategory %></td>
-            <td><%= product.productPrice %> so'm</td>
+            <td><%= product.productPrice %> UZS</td>
             <td><%= product.productViews %></td>
             <td><%= product.productStatus %></td>
             <td>
               <% if (product.productImage) { %>
                 <img src="/uploads/<%= product.productImage %>" class="product-thumb">
               <% } else { %>
-                <span>Rasm yo'q</span>
+                <span>No image</span>
               <% } %>
             </td>
             <td>
@@ -60,19 +60,19 @@
                 <div id="dropdown-<%= product._id %>" class="dropdown-menu">
                   <form action="/admin/products/<%= product._id %>/status" method="POST">
                     <input type="hidden" name="status" value="PROCESS">
-                    <button type="submit">Faollashtirish</button>
+                    <button type="submit">Activate</button>
                   </form>
                   <form action="/admin/products/<%= product._id %>/status" method="POST">
                     <input type="hidden" name="status" value="PAUSE">
-                    <button type="submit">Pauza</button>
+                    <button type="submit">Pause</button>
                   </form>
                   <form action="/admin/products/<%= product._id %>/status" method="POST">
                     <input type="hidden" name="status" value="SOLD_OUT">
-                    <button type="submit">Tugagan</button>
+                    <button type="submit">Sold out</button>
                   </form>
                   <form action="/admin/products/<%= product._id %>/status" method="POST">
                     <input type="hidden" name="status" value="DELETE">
-                    <button type="submit">O'chirish</button>
+                    <button type="submit">Delete</button>
                   </form>
                 </div>
               </div>
@@ -85,18 +85,18 @@
     </div>
 
     <div class="button-row">
-      <button class="btn-primary" type="button" onclick="toggleForm()">+ Yangi mahsulot</button>
+      <button class="btn-primary" type="button" onclick="toggleForm()">+ Add product</button>
     </div>
 
     <div id="createForm" style="display:none;">
       <form action="/admin/products/create" method="POST" enctype="multipart/form-data">
-        <label>Nomi:</label>
+        <label>Name:</label>
         <input type="text" name="productName" required>
 
-        <label>Narxi:</label>
+        <label>Price:</label>
         <input type="number" name="productPrice" required>
 
-        <label>Kategoriya:</label>
+        <label>Category:</label>
         <select name="productCategory">
           <option value="CUPCAKE">CUPCAKE</option>
           <option value="CAKE">CAKE</option>
@@ -104,10 +104,10 @@
           <option value="OTHER">OTHER</option>
         </select>
 
-        <label>Tavsif:</label>
+        <label>Description:</label>
         <textarea name="productDesc"></textarea>
 
-        <label>Rasm:</label>
+        <label>Image:</label>
         <input type="file" name="productImage">
 
         <br><br>

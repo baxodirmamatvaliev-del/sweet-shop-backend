@@ -132,7 +132,7 @@ label {
 }
 
 
-/* Status  */
+/* Status menu */
 
 
 .status-dropdown {
@@ -177,7 +177,7 @@ label {
   background-color: #f2f2f2;
 }
 
-/* rasim size */
+/* Image size */
 .product-thumb {
   width: 60px;
   height: 60px;
@@ -185,7 +185,7 @@ label {
   border-radius: 6px;
 }
 
-/* login page  */
+/* Login page */
 
 body.login-page {
   margin: 0;
@@ -464,6 +464,40 @@ body.admin-page h1 {
   text-decoration: none;
 }
 
+.back-to-products {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px 12px 12px;
+  border: 1px solid rgba(123, 63, 0, 0.18);
+  border-radius: 12px;
+  background: rgba(255, 253, 249, 0.78);
+  color: #713808;
+  box-shadow: 0 6px 16px rgba(102, 58, 19, 0.1);
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.back-to-products span {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 8px;
+  background: #7b3f00;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.back-to-products:hover {
+  background: #fffdf9;
+  box-shadow: 0 10px 22px rgba(102, 58, 19, 0.16);
+  transform: translateY(-2px);
+}
+
 .table-card {
   overflow: hidden;
   background: #fffdf9;
@@ -613,5 +647,10 @@ table.products-table {
 
   .add-product-button {
     width: 100%;
+  }
+
+  .back-to-products {
+    width: 100%;
+    justify-content: center;
   }
 }

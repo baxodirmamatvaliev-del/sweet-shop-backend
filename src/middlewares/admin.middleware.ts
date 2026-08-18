@@ -12,7 +12,7 @@ export const verifyAdmin = (req: any, res: Response, next: NextFunction) => {
     const decoded: any = jwt.verify(token, process.env.JWT_SECRET as string);
 
     if (decoded.memberType !== "ADMIN") {
-      return res.status(403).send("Only the ADMIN can acces it: ordinary users do not have permisson to do so‼️");
+      return res.status(403).send("Only administrators can access this page.");
     }
 
     req.member = decoded;

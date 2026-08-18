@@ -5,12 +5,12 @@ import Errors, { HttpCode, Message } from "../libs/Errors";
 const memberService = new MemberService();
 const memberController: any = {};
 
-// members signup boladi yani Authentication boladi
+// Member registration
 memberController.signup = async (req: Request, res: Response) => { //
   try {
     console.log("signup");
-    const result = await memberService.signup(req.body); // kelgan inputni DB ga saqlaymz  natija result ga saqlaymiz
-    res.status(201).json({ data: result }); //natijani json formatda qaytaramiz
+    const result = await memberService.signup(req.body);
+    res.status(201).json({ data: result });
 
   } catch (err: any) {
     console.error("ERROR, signup", err);
@@ -18,17 +18,17 @@ memberController.signup = async (req: Request, res: Response) => { //
   }
 };
 
-//  members login bu yerda ham shunday login Authentication boladi 
+// Member authentication
 memberController.login = async (req: Request, res: Response) => {
   try {
 
     console.log("login");
-    const { member, token } = await memberService.login(req.body); //kelgan datani DB da tekshiramiz togri bosa member , token ga saqlamz
+    const { member, token } = await memberService.login(req.body);
     res.cookie("accessToken", token, {
       maxAge: 24 * 60 * 60 * 1000,
-      httpOnly: true, // buni faqat server oqishi mumkin, client oqiy olmaydi, hafsiz qildik 
+      httpOnly: true,
     });
-    res.status(200).json({ data: member }); // natijani json daa qaytaramz
+    res.status(200).json({ data: member });
 
   } catch (err: any) {
     console.error("ERROR, login", err);

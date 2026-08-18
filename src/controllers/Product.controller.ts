@@ -7,7 +7,7 @@ const productService = new ProductService();
 
 const productController: any = {};
 
-// Barcha mahsulotlarni olish: GET /products
+// Get all products: GET /products
 productController.getProducts = async (req: Request, res: Response) => {
   try {
     console.log("getProducts");
@@ -19,7 +19,7 @@ productController.getProducts = async (req: Request, res: Response) => {
   }
 };
 
-// Bitta mahsulotni olish: GET /products/:id
+// Get a single product: GET /products/:id
 productController.getProduct = async (req: Request, res: Response) => {
   try {
     console.log("getProduct");
@@ -32,7 +32,7 @@ productController.getProduct = async (req: Request, res: Response) => {
   }
 };
 
-// Yangi mahsulot yaratish: POST /products
+// Create a new product: POST /products
 productController.createProduct = async (req: Request, res: Response) => {
   try {
     console.log("createProduct");

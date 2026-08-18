@@ -16,6 +16,6 @@ export const verifyAuth = (req: any, res: Response, next: NextFunction) => {
     
   } catch (err) {
     console.log("ERROR, verifyAuth:", err);
-    res.status(401).json({ message: "Iltimos, tizimga kiring" });
+    res.status(401).json({ message: "Please sign in first." });
   }
 };
