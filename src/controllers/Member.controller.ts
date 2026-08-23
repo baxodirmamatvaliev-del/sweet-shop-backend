@@ -21,10 +21,13 @@ memberController.signup = async (req: Request, res: Response) => { //
     });
     res.status(201).json({ data: result });
 
-  } catch (err: any) {
-    console.error("ERROR, signup", err);
-      throw new Errors(HttpCode.BAD_REQUEST, Message.ERROR_SERVICE);
-  }
+   } catch (err: any) {
+  console.error("ERROR, signup", err);
+
+  return res.status(err.code ?? 500).json({
+    message: err.message ?? "Signup failed",
+   });
+ }
 };
 
 // Member authentication
@@ -40,9 +43,12 @@ memberController.login = async (req: Request, res: Response) => {
     res.status(200).json({ data: member });
 
   } catch (err: any) {
-    console.error("ERROR, login", err);
-     throw new Errors(HttpCode.BAD_REQUEST, Message.ERROR_SERVICE);
-  }
+  console.error("ERROR, login", err);
+
+  return res.status(err.code ?? 500).json({
+    message: err.message ?? "Login failed",
+  });
+}
 };
 
 export default memberController;
