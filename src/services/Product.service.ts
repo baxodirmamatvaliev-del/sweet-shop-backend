@@ -35,10 +35,14 @@ class ProductService {
       
       return result;
 
-    } catch (err) {
+    } catch (err: any) {
 
       console.error("ERROR, model createProduct", err);
-      throw new Errors(HttpCode.BAD_REQUEST, Message.USED_PRODUCT_NAME);
+      if (err?.code === 11000) {
+        throw new Errors(HttpCode.BAD_REQUEST, Message.USED_PRODUCT_NAME);
+      }
+
+      throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
 
     }
   }

@@ -49,9 +49,16 @@
             <td><%= product.productStatus %></td>
             <td>
               <% if (product.productImage) { %>
-                <img src="/uploads/<%= product.productImage %>" class="product-thumb">
+                <div class="product-image-frame">
+                  <img
+                    src="/uploads/<%= product.productImage %>"
+                    class="product-thumb"
+                    alt="<%= product.productName %>"
+                    loading="lazy"
+                  >
+                </div>
               <% } else { %>
-                <span>No image</span>
+                <span class="no-image">No image</span>
               <% } %>
             </td>
             <td>
@@ -84,31 +91,57 @@
       </div>
     </div>
 
-    <div class="button-row">
-      <button class="btn-primary" type="button" onclick="toggleForm()">+ Add product</button>
-    </div>
-
-    <div id="createForm" style="display:none;">
+    <div id="createForm" style="display:<%= createError ? 'block' : 'none' %>;">
       <form action="/admin/products/create" method="POST" enctype="multipart/form-data">
+        <% if (createError) { %>
+          <div class="create-form-error" role="alert">
+            <strong>Product could not be created.</strong>
+            <span><%= createError %></span>
+          </div>
+        <% } %>
+
         <label>Name:</label>
-        <input type="text" name="productName" required>
+        <input type="text" name="productName" value="<%= formData.productName || '' %>" required>
 
         <label>Price:</label>
-        <input type="number" name="productPrice" required>
+        <input type="number" name="productPrice" value="<%= formData.productPrice || '' %>" required>
 
         <label>Category:</label>
         <select name="productCategory">
-          <option value="CUPCAKE">CUPCAKE</option>
-          <option value="CAKE">CAKE</option>
-          <option value="COOKIE">COOKIE</option>
-          <option value="OTHER">OTHER</option>
+          <option value="CUPCAKE" <%= formData.productCategory === 'CUPCAKE' ? 'selected' : '' %>>CUPCAKE</option>
+          <option value="CAKE" <%= formData.productCategory === 'CAKE' ? 'selected' : '' %>>CAKE</option>
+          <option value="COOKIE" <%= formData.productCategory === 'COOKIE' ? 'selected' : '' %>>COOKIE</option>
+          <option value="OTHER" <%= formData.productCategory === 'OTHER' ? 'selected' : '' %>>OTHER</option>
         </select>
 
         <label>Description:</label>
-        <textarea name="productDesc"></textarea>
+        <textarea name="productDesc"><%= formData.productDesc || '' %></textarea>
 
         <label>Image:</label>
-        <input type="file" name="productImage">
+        <div class="image-upload" id="imageUpload">
+          <input
+            id="productImage"
+            class="image-upload-input"
+            type="file"
+            name="productImage"
+            accept="image/png,image/jpeg,image/webp"
+          >
+          <label class="image-upload-label" for="productImage">
+            <span class="image-upload-icon" aria-hidden="true">↑</span>
+            <span class="image-upload-copy">
+              <strong>Choose an image</strong>
+              <small>PNG, JPG or WEBP</small>
+            </span>
+          </label>
+          <div class="image-preview" id="imagePreview" hidden>
+            <img id="imagePreviewImg" src="" alt="Selected product preview">
+            <div class="image-preview-info">
+              <strong id="imageFileName"></strong>
+              <span>Image selected successfully</span>
+              <button type="button" class="image-change-button" id="imageChangeButton">Choose another</button>
+            </div>
+          </div>
+        </div>
 
         <br><br>
         <button type="submit" class="btn-create">Create</button>
@@ -138,6 +171,34 @@
           m.style.display = "none";
         });
       }
+    });
+
+    const imageInput = document.getElementById("productImage");
+    const imageUploadLabel = document.querySelector(".image-upload-label");
+    const imagePreview = document.getElementById("imagePreview");
+    const imagePreviewImg = document.getElementById("imagePreviewImg");
+    const imageFileName = document.getElementById("imageFileName");
+    const imageChangeButton = document.getElementById("imageChangeButton");
+    let previewUrl;
+
+    imageInput.addEventListener("change", function() {
+      const file = imageInput.files[0];
+      if (!file) return;
+
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      previewUrl = URL.createObjectURL(file);
+      imagePreviewImg.src = previewUrl;
+      imageFileName.textContent = file.name;
+      imageUploadLabel.hidden = true;
+      imagePreview.hidden = false;
+    });
+
+    imageChangeButton.addEventListener("click", function() {
+      imageInput.click();
+    });
+
+    window.addEventListener("beforeunload", function() {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
     });
   </script>
 </body>

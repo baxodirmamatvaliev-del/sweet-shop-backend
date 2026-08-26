@@ -3,6 +3,7 @@ import ProductService from "../services/Product.service";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import MemberService from "../services/Member.service";
 import { MemberType } from "../libs/enums/member.enum";
+import { unlink } from "fs/promises";
 
 const memberService = new MemberService();
 
@@ -14,7 +15,7 @@ const adminController: any = {};
 adminController.getProductsPage = async (req: Request, res: Response) => {
   try {
     const products = await productService.getProducts();
-    res.render("products", { products });
+    res.render("products", { products, createError: null, formData: {} });
   } catch (err) {
     console.error("ERROR, getProductsPage", err);
     throw new Errors(HttpCode.BAD_REQUEST, Message.ERROR_SERVICE);
@@ -69,7 +70,21 @@ adminController.processCreateProduct = async (req: Request, res: Response) => {
     res.redirect("/admin/products");
   } catch (err) {
     console.error("ERROR, processCreateProduct", err);
-    res.status(500).send("Unable to create the product.");
+
+    if (req.file?.path) {
+      await unlink(req.file.path).catch(() => undefined);
+    }
+
+    const products = await productService.getProducts().catch(() => []);
+    const createError = err instanceof Errors
+      ? err.message
+      : Message.CREATE_FAILED;
+
+    res.status(400).render("products", {
+      products,
+      createError,
+      formData: req.body,
+    });
   }
 };
 
