@@ -74,6 +74,52 @@ class MemberService {
     return result;
   }
 
+  public async updateMember(memberId: string, input: any): Promise<any> {
+    const id = shapeIntoMongooseObjectId(memberId);
+    const allowedFields = [
+      "memberNick",
+      "memberPhone",
+      "memberAddress",
+      "memberDesc",
+    ] as const;
+    const update: Record<string, string> = {};
+
+    for (const field of allowedFields) {
+      if (input[field] === undefined) continue;
+
+      if (typeof input[field] !== "string") {
+        throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_MEMBER_UPDATE);
+      }
+
+      const value = input[field].trim();
+      if ((field === "memberNick" || field === "memberPhone") && !value) {
+        throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_MEMBER_UPDATE);
+      }
+
+      update[field] = value;
+    }
+
+    if (Object.keys(update).length === 0) {
+      throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_MEMBER_UPDATE);
+    }
+
+    try {
+      const result = await this.memberModel
+        .findByIdAndUpdate(id, update, { new: true, runValidators: true })
+        .exec();
+
+      if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+      return result;
+    } catch (err: any) {
+      if (err instanceof Errors) throw err;
+      if (err?.code === 11000) {
+        throw new Errors(HttpCode.BAD_REQUEST, Message.USED_NICK_PHONE);
+      }
+
+      throw new Errors(HttpCode.BAD_REQUEST, Message.UPDATE_FAILED);
+    }
+  }
+
 }
 
 export default MemberService;

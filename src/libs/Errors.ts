@@ -15,6 +15,7 @@ export enum Message {
   USED_PRODUCT_NAME = "This product name is already in use!",
   INVALID_ORDER = "Please provide valid delivery details and order items.",
   PRODUCT_NOT_AVAILABLE = "One or more products are unavailable.",
+  INVALID_MEMBER_UPDATE = "Please provide valid profile information.",
   USED_NICK_PHONE = "USED_NICK_PHONE",
   NO_MEMBER_NICK = "NO_MEMBER_NICK",
   WRONG_PASSWORD = "WRONG_PASSWORD",
