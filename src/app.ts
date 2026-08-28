@@ -6,6 +6,7 @@ import memberRouter from "./routes/Member.route";
 import { MORGAN_FORMAT } from "./libs/config";
 import adminRouter from "./routes/Admin.route";
 import cors from "cors";
+import orderRouter from "./routes/Order.route";
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.get("/", (req, res) => {
 
 app.use("/products", productRouter);
 app.use("/members", memberRouter);
+app.use("/orders", orderRouter);
 
 
 export default app;
