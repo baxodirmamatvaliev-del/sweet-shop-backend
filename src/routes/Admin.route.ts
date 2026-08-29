@@ -17,6 +17,8 @@ adminRouter.post("/products/:id/status", verifyAdmin, adminController.updateProd
 adminRouter.post("/products/create", verifyAdmin, uploader.single("productImage"), adminController.processCreateProduct);
 adminRouter.get("/users", verifyAdmin, adminController.getUsersPage);
 adminRouter.post("/users/:id/status", verifyAdmin, adminController.updateMemberStatus);
+adminRouter.get("/quick-orders", verifyAdmin, adminController.getQuickOrdersPage);
+adminRouter.post("/quick-orders/:id/status", verifyAdmin, adminController.updateQuickOrderStatus);
 adminRouter.post("/logout", verifyAdmin, adminController.logout);
 
 export default adminRouter;

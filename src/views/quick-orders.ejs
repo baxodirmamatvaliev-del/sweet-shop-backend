@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sweet Shop Admin - Quick orders</title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-page">
+  <%- include('includes/header') %>
+
+  <main class="container products-page">
+    <div class="page-heading">
+      <div>
+        <p class="eyebrow">Admin panel</p>
+        <h1>Quick orders</h1>
+        <p class="page-description">Mijozlardan kelgan tezkor buyurtma so‘rovlari.</p>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-scroll">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Telefon</th>
+              <th>Holat</th>
+              <th>Yuborilgan vaqt</th>
+              <th>Amal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (quickOrders.length === 0) { %>
+              <tr><td colspan="4" class="empty-table">Hozircha quick-order so‘rovlari yo‘q.</td></tr>
+            <% } %>
+            <% quickOrders.forEach(function(order) { %>
+              <tr>
+                <td><a href="tel:<%= order.phone %>"><%= order.phone %></a></td>
+                <td><span class="status-badge status-<%= order.status.toLowerCase() %>"><%= order.status %></span></td>
+                <td><%= new Date(order.createdAt).toLocaleString('uz-UZ') %></td>
+                <td>
+                  <form action="/admin/quick-orders/<%= order._id %>/status" method="POST" class="quick-order-action">
+                    <select name="status" aria-label="Quick-order holati">
+                      <option value="NEW" <%= order.status === 'NEW' ? 'selected' : '' %>>Yangi</option>
+                      <option value="CONTACTED" <%= order.status === 'CONTACTED' ? 'selected' : '' %>>Bog‘lanildi</option>
+                      <option value="CANCELLED" <%= order.status === 'CANCELLED' ? 'selected' : '' %>>Bekor qilindi</option>
+                    </select>
+                    <button type="submit" class="btn-primary">Saqlash</button>
+                  </form>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

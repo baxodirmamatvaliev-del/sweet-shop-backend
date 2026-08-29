@@ -4,12 +4,34 @@ import Errors, { HttpCode, Message } from "../libs/Errors";
 import MemberService from "../services/Member.service";
 import { MemberType } from "../libs/enums/member.enum";
 import { unlink } from "fs/promises";
+import QuickOrderService from "../services/QuickOrder.service";
 
 const memberService = new MemberService();
 
 const productService = new ProductService();
+const quickOrderService = new QuickOrderService();
 
 const adminController: any = {};
+
+adminController.getQuickOrdersPage = async (req: Request, res: Response) => {
+  try {
+    const quickOrders = await quickOrderService.getQuickOrders();
+    res.render("quick-orders", { quickOrders });
+  } catch (err) {
+    console.error("ERROR, getQuickOrdersPage", err);
+    res.status(500).send("Quick-order so‘rovlarini yuklab bo‘lmadi.");
+  }
+};
+
+adminController.updateQuickOrderStatus = async (req: Request, res: Response) => {
+  try {
+    await quickOrderService.updateStatus(req.params.id as string, req.body.status);
+    res.redirect("/admin/quick-orders");
+  } catch (err: any) {
+    console.error("ERROR, updateQuickOrderStatus", err);
+    res.status(err.code ?? 500).send(err.message ?? "Quick-order holatini yangilab bo‘lmadi.");
+  }
+};
 
 // Admin panel: products page
 adminController.getProductsPage = async (req: Request, res: Response) => {
