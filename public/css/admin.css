@@ -73,6 +73,35 @@ button:hover {
   color: white;
 }
 
+.btn-edit {
+  margin-right: 6px;
+  background: #1565c0;
+  color: white;
+}
+
+.edit-product-panel {
+  width: 100%;
+  margin-top: 20px;
+  padding: 25px;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.edit-product-panel[hidden] {
+  display: none;
+}
+
+.edit-product-panel h2 {
+  margin-top: 0;
+  color: #7b3f00;
+}
+
+.edit-product-panel input[type="file"] {
+  display: block;
+  margin: 8px 0;
+}
+
 
 .btn-cancel {
   background-color: #c62828;
@@ -96,6 +125,10 @@ button:hover {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   margin-top: 20px;
   max-width: 500px;
+}
+
+#createForm[hidden] {
+  display: none;
 }
 
 

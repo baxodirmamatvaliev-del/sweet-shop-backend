@@ -14,6 +14,7 @@ adminRouter.post("/signup", adminController.processSignup);
 // Protected admin routes
 adminRouter.get("/products", verifyAdmin, adminController.getProductsPage);
 adminRouter.post("/products/:id/status", verifyAdmin, adminController.updateProductStatus);
+adminRouter.patch("/products/:id", verifyAdmin, uploader.single("productImage"), adminController.updateProduct);
 adminRouter.post("/products/create", verifyAdmin, uploader.single("productImage"), adminController.processCreateProduct);
 adminRouter.get("/users", verifyAdmin, adminController.getUsersPage);
 adminRouter.post("/users/:id/status", verifyAdmin, adminController.updateMemberStatus);

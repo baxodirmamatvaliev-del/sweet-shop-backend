@@ -63,6 +63,17 @@
               <% } %>
             </td>
             <td>
+              <button
+                type="button"
+                class="btn-edit"
+                data-product-id="<%= product._id %>"
+                data-product-name="<%= product.productName %>"
+                data-product-price="<%= product.productPrice %>"
+                data-product-category="<%= product.productCategory %>"
+                data-product-desc="<%= product.productDesc || '' %>"
+                data-product-image="<%= product.productImage || '' %>"
+                onclick="openEditForm(this)"
+              >Edit</button>
               <div class="status-dropdown">
                 <button type="button" class="btn-status-toggle" onclick="toggleDropdown('dropdown-<%= product._id %>')">Status ▾</button>
                 <div id="dropdown-<%= product._id %>" class="dropdown-menu">
@@ -92,7 +103,41 @@
       </div>
     </div>
 
-    <div id="createForm" style="display:<%= createError ? 'block' : 'none' %>;">
+    <div id="editForm" class="edit-product-panel" hidden>
+      <form id="editProductForm" enctype="multipart/form-data">
+        <h2>Edit product</h2>
+        <div id="editProductError" class="create-form-error" role="alert" hidden></div>
+
+        <label for="editProductName">Name:</label>
+        <input id="editProductName" type="text" name="productName" required>
+
+        <label for="editProductPrice">Price:</label>
+        <input id="editProductPrice" type="number" name="productPrice" min="0" required>
+
+        <label for="editProductCategory">Category:</label>
+        <select id="editProductCategory" name="productCategory" required>
+          <option value="CUPCAKE">CUPCAKE</option>
+          <option value="CAKE">CAKE</option>
+          <option value="BIRTHDAY_CAKE">BIRTHDAY CAKE</option>
+          <option value="COOKIE">COOKIE</option>
+          <option value="OTHER">OTHER</option>
+        </select>
+
+        <label for="editProductDesc">Description:</label>
+        <textarea id="editProductDesc" name="productDesc"></textarea>
+
+        <label for="editProductImage">New image (optional):</label>
+        <input id="editProductImage" type="file" name="productImage" accept="image/png,image/jpeg,image/webp">
+        <small id="currentProductImage"></small>
+
+        <div class="button-row">
+          <button id="editSubmitButton" type="submit" class="btn-create">Save changes</button>
+          <button type="button" class="btn-cancel" onclick="closeEditForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="createForm" <%= createError ? '' : 'hidden' %>>
       <form action="/admin/products/create" method="POST" enctype="multipart/form-data">
         <% if (createError) { %>
           <div class="create-form-error" role="alert">
@@ -153,9 +198,61 @@
   </main>
 
   <script>
+    const editPanel = document.getElementById("editForm");
+    const editProductForm = document.getElementById("editProductForm");
+    const editProductError = document.getElementById("editProductError");
+    let editingProductId = "";
+
+    function openEditForm(button) {
+      editingProductId = button.dataset.productId;
+      document.getElementById("editProductName").value = button.dataset.productName;
+      document.getElementById("editProductPrice").value = button.dataset.productPrice;
+      document.getElementById("editProductCategory").value = button.dataset.productCategory;
+      document.getElementById("editProductDesc").value = button.dataset.productDesc;
+      document.getElementById("editProductImage").value = "";
+      document.getElementById("currentProductImage").textContent = button.dataset.productImage
+        ? `Current image: ${button.dataset.productImage}`
+        : "No current image";
+      editProductError.hidden = true;
+      editPanel.hidden = false;
+      editPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function closeEditForm() {
+      editPanel.hidden = true;
+      editingProductId = "";
+      editProductForm.reset();
+    }
+
+    editProductForm.addEventListener("submit", async function(event) {
+      event.preventDefault();
+      if (!editingProductId) return;
+
+      const submitButton = document.getElementById("editSubmitButton");
+      submitButton.disabled = true;
+      submitButton.textContent = "Saving...";
+      editProductError.hidden = true;
+
+      try {
+        const response = await fetch(`/admin/products/${editingProductId}`, {
+          method: "PATCH",
+          body: new FormData(editProductForm),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message);
+        window.location.reload();
+      } catch (error) {
+        editProductError.textContent = error.message || "Unable to update the product.";
+        editProductError.hidden = false;
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Save changes";
+      }
+    });
+
     function toggleForm() {
       const form = document.getElementById("createForm");
-      form.style.display = form.style.display === "none" ? "block" : "none";
+      form.hidden = !form.hidden;
     }
 
     function toggleDropdown(id) {

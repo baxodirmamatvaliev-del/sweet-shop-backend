@@ -4,6 +4,7 @@ import Errors, { HttpCode, Message } from "../libs/Errors";
 import MemberService from "../services/Member.service";
 import { MemberType } from "../libs/enums/member.enum";
 import { unlink } from "fs/promises";
+import path from "path";
 import QuickOrderService from "../services/QuickOrder.service";
 import OrderService from "../services/Order.service";
 
@@ -108,6 +109,44 @@ adminController.updateProductStatus = async (req: Request, res: Response) => {
   } catch (err) {
     console.error("ERROR, updateProductStatus", err);
     res.status(500).send("Unable to update the product status.");
+  }
+};
+
+adminController.updateProduct = async (req: Request, res: Response) => {
+  try {
+    const productName = String(req.body.productName ?? "").trim();
+    const productPrice = Number(req.body.productPrice);
+    const productCategory = String(req.body.productCategory ?? "");
+    const productDesc = String(req.body.productDesc ?? "").trim();
+
+    if (!productName || !Number.isFinite(productPrice) || productPrice < 0) {
+      if (req.file?.path) await unlink(req.file.path).catch(() => undefined);
+      return res.status(400).json({ message: "Please provide valid product details." });
+    }
+
+    const input: any = { productName, productPrice, productCategory, productDesc };
+    if (req.file) input.productImage = req.file.filename;
+
+    const previousProduct = req.file
+      ? await productService.getProductWithoutView(req.params.id as string)
+      : null;
+    const product = await productService.updateProduct(req.params.id as string, input);
+
+    if (req.file && previousProduct?.productImage) {
+      const oldImagePath = path.join("public", "uploads", path.basename(previousProduct.productImage));
+      await unlink(oldImagePath).catch(() => undefined);
+    }
+
+    return res.status(200).json({
+      message: "Product updated successfully.",
+      data: product,
+    });
+  } catch (err: any) {
+    if (req.file?.path) await unlink(req.file.path).catch(() => undefined);
+    console.error("ERROR, updateProduct", err);
+    return res.status(err.code ?? 500).json({
+      message: err.message ?? "Unable to update the product.",
+    });
   }
 };
 
