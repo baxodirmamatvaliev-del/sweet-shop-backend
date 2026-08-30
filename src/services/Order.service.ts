@@ -27,6 +27,33 @@ const convertLegacyPriceToUSD = (price: number): number =>
   price >= 1000 ? price / 1000 : price;
 
 class OrderService {
+  public async cancelMyOrder(memberId: string, orderId: string): Promise<any> {
+    if (!mongoose.isValidObjectId(memberId) || !mongoose.isValidObjectId(orderId)) {
+      throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_ORDER);
+    }
+
+    const order = await OrderModel.findOneAndUpdate(
+      {
+        _id: orderId,
+        memberId,
+        orderStatus: "PENDING",
+      },
+      { orderStatus: "CANCELLED" },
+      { new: true, runValidators: true },
+    )
+      .lean()
+      .exec();
+
+    if (order) return order;
+
+    const existingOrder = await OrderModel.exists({ _id: orderId, memberId }).exec();
+    if (!existingOrder) {
+      throw new Errors(HttpCode.NOT_FOUND, Message.ORDER_NOT_FOUND);
+    }
+
+    throw new Errors(HttpCode.BAD_REQUEST, Message.ORDER_CANNOT_BE_CANCELLED);
+  }
+
   public async getOrders(): Promise<any[]> {
     return OrderModel.find()
       .sort({ createdAt: -1 })

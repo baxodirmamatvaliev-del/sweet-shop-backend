@@ -4,6 +4,24 @@ import OrderService from "../services/Order.service";
 const orderService = new OrderService();
 const orderController: any = {};
 
+orderController.cancelMyOrder = async (req: any, res: Response) => {
+  try {
+    const order = await orderService.cancelMyOrder(
+      req.member._id.toString(),
+      req.params.id as string,
+    );
+    return res.status(200).json({
+      message: "Order cancelled successfully.",
+      data: order,
+    });
+  } catch (err: any) {
+    console.error("ERROR, cancelMyOrder", err);
+    return res.status(err.code ?? 500).json({
+      message: err.message ?? "Unable to cancel the order.",
+    });
+  }
+};
+
 orderController.getMyOrders = async (req: any, res: Response) => {
   try {
     const orders = await orderService.getMyOrders(req.member._id.toString());
