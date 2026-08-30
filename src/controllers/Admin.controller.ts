@@ -19,7 +19,7 @@ adminController.getQuickOrdersPage = async (req: Request, res: Response) => {
     res.render("quick-orders", { quickOrders });
   } catch (err) {
     console.error("ERROR, getQuickOrdersPage", err);
-    res.status(500).send("Quick-order so‘rovlarini yuklab bo‘lmadi.");
+    res.status(500).send("Unable to load quick-order requests.");
   }
 };
 
@@ -29,7 +29,7 @@ adminController.updateQuickOrderStatus = async (req: Request, res: Response) => 
     res.redirect("/admin/quick-orders");
   } catch (err: any) {
     console.error("ERROR, updateQuickOrderStatus", err);
-    res.status(err.code ?? 500).send(err.message ?? "Quick-order holatini yangilab bo‘lmadi.");
+    res.status(err.code ?? 500).send(err.message ?? "Unable to update the quick-order status.");
   }
 };
 

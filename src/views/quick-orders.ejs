@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sweet Shop Admin - Quick orders</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body class="admin-page">
@@ -14,7 +15,7 @@
       <div>
         <p class="eyebrow">Admin panel</p>
         <h1>Quick orders</h1>
-        <p class="page-description">Mijozlardan kelgan tezkor buyurtma so‘rovlari.</p>
+        <p class="page-description">Review quick-order requests submitted by customers.</p>
       </div>
     </div>
 
@@ -23,15 +24,15 @@
         <table class="products-table">
           <thead>
             <tr>
-              <th>Telefon</th>
-              <th>Holat</th>
-              <th>Yuborilgan vaqt</th>
-              <th>Amal</th>
+              <th>Phone</th>
+              <th>Status</th>
+              <th>Submitted at</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             <% if (quickOrders.length === 0) { %>
-              <tr><td colspan="4" class="empty-table">Hozircha quick-order so‘rovlari yo‘q.</td></tr>
+              <tr><td colspan="4" class="empty-table">No quick-order requests yet.</td></tr>
             <% } %>
             <% quickOrders.forEach(function(order) { %>
               <tr>
@@ -40,12 +41,12 @@
                 <td><%= new Date(order.createdAt).toLocaleString('uz-UZ') %></td>
                 <td>
                   <form action="/admin/quick-orders/<%= order._id %>/status" method="POST" class="quick-order-action">
-                    <select name="status" aria-label="Quick-order holati">
-                      <option value="NEW" <%= order.status === 'NEW' ? 'selected' : '' %>>Yangi</option>
-                      <option value="CONTACTED" <%= order.status === 'CONTACTED' ? 'selected' : '' %>>Bog‘lanildi</option>
-                      <option value="CANCELLED" <%= order.status === 'CANCELLED' ? 'selected' : '' %>>Bekor qilindi</option>
+                    <select name="status" aria-label="Quick-order status">
+                      <option value="NEW" <%= order.status === 'NEW' ? 'selected' : '' %>>New</option>
+                      <option value="CONTACTED" <%= order.status === 'CONTACTED' ? 'selected' : '' %>>Contacted</option>
+                      <option value="CANCELLED" <%= order.status === 'CANCELLED' ? 'selected' : '' %>>Cancelled</option>
                     </select>
-                    <button type="submit" class="btn-primary">Saqlash</button>
+                    <button type="submit" class="btn-primary">Save</button>
                   </form>
                 </td>
               </tr>

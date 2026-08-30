@@ -25,6 +25,17 @@ const convertLegacyPriceToUSD = (price: number): number =>
   price >= 1000 ? price / 1000 : price;
 
 class OrderService {
+  public async getMyOrders(memberId: string): Promise<any[]> {
+    if (!mongoose.isValidObjectId(memberId)) {
+      throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_ORDER);
+    }
+
+    return OrderModel.find({ memberId })
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
+  }
+
   public async createOrder(memberId: string, input: CreateOrderInput): Promise<any> {
     const customerName = this.requireText(input.customerName);
     const phone = this.requireText(input.phone);

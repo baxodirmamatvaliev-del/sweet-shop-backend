@@ -8,13 +8,13 @@ quickOrderController.createQuickOrder = async (req: Request, res: Response) => {
   try {
     const quickOrder = await quickOrderService.createQuickOrder(req.body);
     return res.status(201).json({
-      message: "So‘rovingiz qabul qilindi. Tez orada siz bilan bog‘lanamiz.",
+      message: "Your request has been received. We will contact you shortly.",
       data: quickOrder,
     });
   } catch (err: any) {
     console.error("ERROR, createQuickOrder", err);
     return res.status(err.code ?? 500).json({
-      message: err.message ?? "Quick-order so‘rovini saqlab bo‘lmadi.",
+      message: err.message ?? "Unable to save the quick-order request.",
     });
   }
 };
