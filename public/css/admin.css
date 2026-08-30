@@ -140,6 +140,27 @@ label {
   white-space: nowrap;
 }
 
+.orders-table small {
+  color: #7b6a5b;
+}
+
+.order-message {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.order-message-success {
+  background: #e4f5e8;
+  color: #176b32;
+}
+
+.order-message-error {
+  background: #fde5e5;
+  color: #9d1e1e;
+}
+
 
 #createForm {
   max-width: 100%;

@@ -16,6 +16,8 @@ type CreateOrderInput = {
   items?: unknown;
 };
 
+type OrderStatus = "PENDING" | "PROCESS" | "DELIVERED" | "CANCELLED";
+
 const FREE_DELIVERY_LIMIT = 100;
 const DELIVERY_FEE = 5;
 
@@ -25,6 +27,44 @@ const convertLegacyPriceToUSD = (price: number): number =>
   price >= 1000 ? price / 1000 : price;
 
 class OrderService {
+  public async getOrders(): Promise<any[]> {
+    return OrderModel.find()
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
+  }
+
+  public async updateOrderStatus(id: string, status: unknown): Promise<any> {
+    const allowedStatuses: OrderStatus[] = [
+      "PENDING",
+      "PROCESS",
+      "DELIVERED",
+      "CANCELLED",
+    ];
+
+    if (
+      !mongoose.isValidObjectId(id) ||
+      typeof status !== "string" ||
+      !allowedStatuses.includes(status as OrderStatus)
+    ) {
+      throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_ORDER_STATUS);
+    }
+
+    const order = await OrderModel.findByIdAndUpdate(
+      id,
+      { orderStatus: status },
+      { new: true },
+    )
+      .lean()
+      .exec();
+
+    if (!order) {
+      throw new Errors(HttpCode.NOT_FOUND, Message.ORDER_NOT_FOUND);
+    }
+
+    return order;
+  }
+
   public async getMyOrders(memberId: string): Promise<any[]> {
     if (!mongoose.isValidObjectId(memberId)) {
       throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_ORDER);

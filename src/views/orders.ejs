@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sweet Shop Admin - Orders</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-page">
+  <%- include('includes/header') %>
+
+  <main class="container products-page">
+    <div class="page-heading">
+      <div>
+        <p class="eyebrow">Admin panel</p>
+        <h1>Order Management</h1>
+        <p class="page-description">Review customer orders and update their status.</p>
+      </div>
+    </div>
+
+    <div id="order-message" class="order-message" role="status" hidden></div>
+
+    <div class="table-card">
+      <div class="table-scroll">
+        <table class="products-table orders-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Phone</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Created at</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (orders.length === 0) { %>
+              <tr><td colspan="7" class="empty-table">No orders found yet.</td></tr>
+            <% } %>
+            <% orders.forEach(function(order) { %>
+              <tr>
+                <td>
+                  <strong><%= order.customerName %></strong><br>
+                  <small><%= order.address %></small>
+                </td>
+                <td><a href="tel:<%= order.phone %>"><%= order.phone %></a></td>
+                <td>
+                  <% order.items.forEach(function(item) { %>
+                    <div><%= item.productName %> × <%= item.quantity %></div>
+                  <% }); %>
+                </td>
+                <td>$<%= Number(order.total).toFixed(2) %></td>
+                <td>
+                  <span id="status-<%= order._id %>" class="status-badge status-<%= order.orderStatus.toLowerCase() %>">
+                    <%= ({ PENDING: 'Pending', PROCESS: 'Processing', CANCELLED: 'Cancelled', DELIVERED: 'Delivered' })[order.orderStatus] || order.orderStatus %>
+                  </span>
+                </td>
+                <td><%= new Date(order.createdAt).toLocaleString('en-GB') %></td>
+                <td>
+                  <form class="quick-order-action order-status-form" data-order-id="<%= order._id %>">
+                    <select name="status" aria-label="Order status">
+                      <% ['PENDING', 'PROCESS', 'CANCELLED', 'DELIVERED'].forEach(function(status) { %>
+                        <option value="<%= status %>" <%= order.orderStatus === status ? 'selected' : '' %>><%= ({ PENDING: 'Pending', PROCESS: 'Processing', CANCELLED: 'Cancelled', DELIVERED: 'Delivered' })[status] %></option>
+                      <% }); %>
+                    </select>
+                    <button type="submit" class="btn-primary">Save</button>
+                  </form>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const message = document.getElementById("order-message");
+    const orderStatusLabels = {
+      PENDING: "Pending",
+      PROCESS: "Processing",
+      CANCELLED: "Cancelled",
+      DELIVERED: "Delivered",
+    };
+
+    document.querySelectorAll(".order-status-form").forEach(function(form) {
+      form.addEventListener("submit", async function(event) {
+        event.preventDefault();
+        const button = form.querySelector("button");
+        const select = form.querySelector("select");
+        const orderId = form.dataset.orderId;
+        button.disabled = true;
+        button.textContent = "Saving...";
+        message.hidden = true;
+
+        try {
+          const response = await fetch(`/admin/orders/${orderId}/status`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: select.value }),
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.message);
+
+          const badge = document.getElementById(`status-${orderId}`);
+          badge.textContent = orderStatusLabels[result.data.orderStatus] || result.data.orderStatus;
+          badge.className = `status-badge status-${result.data.orderStatus.toLowerCase()}`;
+          message.textContent = result.message;
+          message.className = "order-message order-message-success";
+          message.hidden = false;
+        } catch (error) {
+          message.textContent = error.message || "Unable to update the order status.";
+          message.className = "order-message order-message-error";
+          message.hidden = false;
+        } finally {
+          button.disabled = false;
+          button.textContent = "Save";
+        }
+      });
+    });
+  </script>
+</body>
+</html>

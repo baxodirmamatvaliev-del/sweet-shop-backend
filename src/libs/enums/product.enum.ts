@@ -1,6 +1,7 @@
 export enum ProductCategory {
   CUPCAKE = "CUPCAKE",
   CAKE = "CAKE",
+  BIRTHDAY_CAKE = "BIRTHDAY_CAKE",
   COOKIE = "COOKIE",
   OTHER = "OTHER",
 }

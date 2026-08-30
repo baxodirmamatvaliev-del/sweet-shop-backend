@@ -5,13 +5,43 @@ import MemberService from "../services/Member.service";
 import { MemberType } from "../libs/enums/member.enum";
 import { unlink } from "fs/promises";
 import QuickOrderService from "../services/QuickOrder.service";
+import OrderService from "../services/Order.service";
 
 const memberService = new MemberService();
 
 const productService = new ProductService();
 const quickOrderService = new QuickOrderService();
+const orderService = new OrderService();
 
 const adminController: any = {};
+
+adminController.getOrdersPage = async (req: Request, res: Response) => {
+  try {
+    const orders = await orderService.getOrders();
+    res.render("orders", { orders });
+  } catch (err) {
+    console.error("ERROR, getOrdersPage", err);
+    res.status(500).send("Unable to load orders.");
+  }
+};
+
+adminController.updateOrderStatus = async (req: Request, res: Response) => {
+  try {
+    const order = await orderService.updateOrderStatus(
+      req.params.id as string,
+      req.body.status,
+    );
+    return res.status(200).json({
+      message: "Order status updated successfully.",
+      data: order,
+    });
+  } catch (err: any) {
+    console.error("ERROR, updateOrderStatus", err);
+    return res.status(err.code ?? 500).json({
+      message: err.message ?? "Unable to update the order status.",
+    });
+  }
+};
 
 adminController.getQuickOrdersPage = async (req: Request, res: Response) => {
   try {

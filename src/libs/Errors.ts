@@ -15,6 +15,8 @@ export enum Message {
   USED_PRODUCT_NAME = "This product name is already in use!",
   INVALID_ORDER = "Please provide valid delivery details and order items.",
   PRODUCT_NOT_AVAILABLE = "One or more products are unavailable.",
+  INVALID_ORDER_STATUS = "Invalid order status.",
+  ORDER_NOT_FOUND = "Order not found.",
   INVALID_PHONE = "Enter a valid phone number in the 010-1234-5678 format.",
   INVALID_QUICK_ORDER_STATUS = "Invalid quick-order status.",
   QUICK_ORDER_NOT_FOUND = "Quick-order request not found.",
