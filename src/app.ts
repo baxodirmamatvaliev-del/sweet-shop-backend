@@ -13,6 +13,17 @@ import cakeOptionRouter from "./routes/CakeOption.route";
 import aiCakeDesignRouter from "./routes/AiCakeDesign.route";
 
 const app = express();
+const clientOrigins = (
+  process.env.CLIENT_URLS ??
+  process.env.CLIENT_URL ??
+  "http://localhost:5173"
+)
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+export const isAllowedOrigin = (origin?: string): boolean =>
+  !origin || clientOrigins.includes(origin);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
@@ -20,7 +31,12 @@ app.use(cookieParser());
 app.use(morgan(MORGAN_FORMAT));
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin(origin, callback) {
+      if (isAllowedOrigin(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Origin is not allowed by CORS."));
+    },
     credentials: true,
   }),
 );
@@ -45,5 +61,18 @@ app.use("/delivery-slots", deliverySlotRouter);
 app.use("/cake-options", cakeOptionRouter);
 app.use("/ai-cake-designs", aiCakeDesignRouter);
 
+app.use(
+  (
+    error: Error,
+    _req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    if (error.message === "Origin is not allowed by CORS.") {
+      return res.status(403).json({ message: error.message });
+    }
+    return next(error);
+  },
+);
 
 export default app;

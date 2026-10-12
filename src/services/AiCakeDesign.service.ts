@@ -15,6 +15,10 @@ type GeneratedImage = {
 };
 
 export type AiImageGenerator = (prompt: string) => Promise<GeneratedImage>;
+export type AiImageStorage = (
+  memberId: string,
+  base64: string,
+) => Promise<string>;
 
 const getSeoulDayKey = (now = new Date()): string =>
   new Date(now.getTime() + SEOUL_OFFSET_MS).toISOString().slice(0, 10);
@@ -81,8 +85,21 @@ const generateWithOpenAi: AiImageGenerator = async (prompt) => {
   return { base64, model: imageModel };
 };
 
+const storeGeneratedImage: AiImageStorage = async (memberId, base64) => {
+  const fileName = `${memberId}-${randomUUID()}.png`;
+  const directory = path.resolve(process.cwd(), "public", "uploads", "ai-designs");
+  await mkdir(directory, { recursive: true });
+  await writeFile(path.join(directory, fileName), Buffer.from(base64, "base64"), {
+    mode: 0o600,
+  });
+  return `/uploads/ai-designs/${fileName}`;
+};
+
 class AiCakeDesignService {
-  constructor(private readonly imageGenerator: AiImageGenerator = generateWithOpenAi) {}
+  constructor(
+    private readonly imageGenerator: AiImageGenerator = generateWithOpenAi,
+    private readonly imageStorage: AiImageStorage = storeGeneratedImage,
+  ) {}
 
   public async getHistory(memberId: string, now = new Date()): Promise<any> {
     this.requireMemberId(memberId);
@@ -122,17 +139,12 @@ class AiCakeDesignService {
 
     const used = await this.claimQuota(memberId, getSeoulDayKey(now));
     const generated = await this.imageGenerator(prompt);
-    const fileName = `${memberId}-${randomUUID()}.png`;
-    const directory = path.resolve(process.cwd(), "public", "uploads", "ai-designs");
-    await mkdir(directory, { recursive: true });
-    await writeFile(path.join(directory, fileName), Buffer.from(generated.base64, "base64"), {
-      mode: 0o600,
-    });
+    const imageUrl = await this.imageStorage(memberId, generated.base64);
 
     const design = await AiCakeDesignModel.create({
       memberId,
       prompt,
-      imageUrl: `/uploads/ai-designs/${fileName}`,
+      imageUrl,
       model: generated.model,
     });
 
