@@ -2,12 +2,23 @@ import mongoose from "mongoose";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import ProductModel from "../schema/Product.model";
 import OrderModel from "../schema/Order.model";
-import { ProductStatus } from "../libs/enums/product.enum";
+import {
+  ProductCategory,
+  ProductStatus,
+} from "../libs/enums/product.enum";
 import { OrderStatus } from "../libs/enums/order.enum";
+import CakePricingService from "./CakePricing.service";
 
 type CreateOrderItemInput = {
   productId?: unknown;
   quantity?: unknown;
+  cakeConfiguration?: unknown;
+};
+
+type NormalizedOrderItem = {
+  productId: string;
+  quantity: number;
+  cakeConfiguration?: unknown;
 };
 
 type CreateOrderInput = {
@@ -24,6 +35,8 @@ const roundMoney = (amount: number): number => Math.round(amount * 100) / 100;
 
 const convertLegacyPriceToUSD = (price: number): number =>
   price >= 1000 ? price / 1000 : price;
+
+const cakePricingService = new CakePricingService();
 
 class OrderService {
   public async cancelMyOrder(memberId: string, orderId: string): Promise<any> {
@@ -141,6 +154,7 @@ class OrderService {
 
     const requestedItems = input.items as CreateOrderItemInput[];
     const quantities = new Map<string, number>();
+    const customizedItems: NormalizedOrderItem[] = [];
 
     for (const item of requestedItems) {
       const productId = typeof item.productId === "string" ? item.productId : "";
@@ -150,10 +164,25 @@ class OrderService {
         throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_ORDER);
       }
 
-      quantities.set(productId, (quantities.get(productId) ?? 0) + quantity);
+      if (item.cakeConfiguration !== undefined) {
+        customizedItems.push({
+          productId,
+          quantity,
+          cakeConfiguration: item.cakeConfiguration,
+        });
+      } else {
+        quantities.set(productId, (quantities.get(productId) ?? 0) + quantity);
+      }
     }
 
-    const productIds = [...quantities.keys()];
+    const normalizedItems: NormalizedOrderItem[] = [
+      ...[...quantities].map(([productId, quantity]) => ({
+        productId,
+        quantity,
+      })),
+      ...customizedItems,
+    ];
+    const productIds = [...new Set(normalizedItems.map((item) => item.productId))];
     const products = await ProductModel.find({
       _id: { $in: productIds },
       productStatus: ProductStatus.PROCESS,
@@ -163,20 +192,56 @@ class OrderService {
       throw new Errors(HttpCode.BAD_REQUEST, Message.PRODUCT_NOT_AVAILABLE);
     }
 
-    const orderItems = products.map((product) => {
-      const productId = product._id.toString();
-      const quantity = quantities.get(productId) as number;
-      const productPrice = roundMoney(convertLegacyPriceToUSD(product.productPrice));
+    const productsById = new Map(
+      products.map((product) => [product._id.toString(), product]),
+    );
+    const orderItems = await Promise.all(
+      normalizedItems.map(async (item) => {
+        const product = productsById.get(item.productId);
+        if (!product) {
+          throw new Errors(HttpCode.BAD_REQUEST, Message.PRODUCT_NOT_AVAILABLE);
+        }
 
-      return {
-        productId: product._id,
-        productName: product.productName,
-        productImage: product.productImage ?? "",
-        productPrice,
-        quantity,
-        itemTotal: roundMoney(productPrice * quantity),
-      };
-    });
+        const basePrice = roundMoney(
+          convertLegacyPriceToUSD(product.productPrice),
+        );
+
+        if (item.cakeConfiguration !== undefined) {
+          if (product.productCategory !== ProductCategory.BIRTHDAY_CAKE) {
+            throw new Errors(
+              HttpCode.BAD_REQUEST,
+              Message.INVALID_CAKE_CONFIGURATION,
+            );
+          }
+
+          const cakeConfiguration = await cakePricingService.calculate(
+            basePrice,
+            item.cakeConfiguration,
+          );
+
+          return {
+            productId: product._id,
+            productName: product.productName,
+            productImage: product.productImage ?? "",
+            productPrice: cakeConfiguration.finalPrice,
+            quantity: item.quantity,
+            itemTotal: roundMoney(
+              cakeConfiguration.finalPrice * item.quantity,
+            ),
+            cakeConfiguration,
+          };
+        }
+
+        return {
+          productId: product._id,
+          productName: product.productName,
+          productImage: product.productImage ?? "",
+          productPrice: basePrice,
+          quantity: item.quantity,
+          itemTotal: roundMoney(basePrice * item.quantity),
+        };
+      }),
+    );
 
     const subtotal = roundMoney(
       orderItems.reduce((sum, item) => sum + item.itemTotal, 0),
