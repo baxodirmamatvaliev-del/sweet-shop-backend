@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sweet Shop Admin - Dashboard</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-page">
+  <%- include('includes/header') %>
+
+  <%
+    const formatMoney = (value) => new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(value);
+    const maxRevenue = Math.max(...overview.dailyRevenue.map((day) => day.revenue), 1);
+    const activeOrders = ['PENDING', 'CONFIRMED', 'BAKING', 'DECORATING', 'OUT_FOR_DELIVERY']
+      .reduce((total, status) => total + (overview.statusCounts[status] || 0), 0);
+    const statusLabels = {
+      PENDING: 'Pending',
+      CONFIRMED: 'Confirmed',
+      BAKING: 'Baking',
+      DECORATING: 'Decorating',
+      OUT_FOR_DELIVERY: 'Out for delivery',
+      DELIVERED: 'Delivered',
+      CANCELLED: 'Cancelled',
+    };
+  %>
+
+  <main class="container products-page dashboard-page">
+    <div class="page-heading">
+      <div>
+        <p class="eyebrow">Admin panel</p>
+        <h1>Sales Overview</h1>
+        <p class="page-description">Monitor order value, delivered revenue, and current workload.</p>
+      </div>
+    </div>
+
+    <section class="dashboard-metrics" aria-label="Sales metrics">
+      <article class="dashboard-metric">
+        <span>Total orders</span>
+        <strong><%= overview.totalOrders %></strong>
+        <small>All recorded orders</small>
+      </article>
+      <article class="dashboard-metric">
+        <span>Gross order value</span>
+        <strong><%= formatMoney(overview.grossOrderValue) %></strong>
+        <small>Excludes cancelled orders</small>
+      </article>
+      <article class="dashboard-metric dashboard-metric--accent">
+        <span>Delivered revenue</span>
+        <strong><%= formatMoney(overview.deliveredRevenue) %></strong>
+        <small>Delivered orders only</small>
+      </article>
+      <article class="dashboard-metric">
+        <span>Active orders</span>
+        <strong><%= activeOrders %></strong>
+        <small>Waiting or in progress</small>
+      </article>
+    </section>
+
+    <div class="dashboard-layout">
+      <section class="dashboard-panel">
+        <header>
+          <div>
+            <p class="eyebrow">Last 7 days</p>
+            <h2>Delivered revenue</h2>
+          </div>
+        </header>
+        <div class="dashboard-chart" aria-label="Seven-day delivered revenue chart">
+          <% overview.dailyRevenue.forEach(function(day) { %>
+            <div class="dashboard-chart__day">
+              <div class="dashboard-chart__track">
+                <span
+                  class="dashboard-chart__bar"
+                  style="height: <%= Math.max((day.revenue / maxRevenue) * 100, day.revenue > 0 ? 8 : 0) %>%"
+                  title="<%= day.date %>: <%= formatMoney(day.revenue) %>"
+                ></span>
+              </div>
+              <strong><%= day.orders %></strong>
+              <small><%= day.date.slice(5) %></small>
+            </div>
+          <% }); %>
+        </div>
+        <p class="dashboard-chart__note">Numbers above dates show delivered orders.</p>
+      </section>
+
+      <section class="dashboard-panel">
+        <header>
+          <div>
+            <p class="eyebrow">Current workload</p>
+            <h2>Orders by status</h2>
+          </div>
+          <a href="/admin/orders">Manage orders →</a>
+        </header>
+        <div class="dashboard-statuses">
+          <% Object.entries(statusLabels).forEach(function(entry) { %>
+            <% const [status, label] = entry; %>
+            <div>
+              <span class="status-badge status-<%= status.toLowerCase().replaceAll('_', '-') %>"><%= label %></span>
+              <strong><%= overview.statusCounts[status] || 0 %></strong>
+            </div>
+          <% }); %>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

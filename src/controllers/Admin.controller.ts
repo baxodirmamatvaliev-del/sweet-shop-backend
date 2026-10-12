@@ -7,14 +7,38 @@ import { unlink } from "fs/promises";
 import path from "path";
 import QuickOrderService from "../services/QuickOrder.service";
 import OrderService from "../services/Order.service";
+import AdminAnalyticsService from "../services/AdminAnalytics.service";
 
 const memberService = new MemberService();
 
 const productService = new ProductService();
 const quickOrderService = new QuickOrderService();
 const orderService = new OrderService();
+const adminAnalyticsService = new AdminAnalyticsService();
 
 const adminController: any = {};
+
+adminController.getSalesOverview = async (_req: Request, res: Response) => {
+  try {
+    const overview = await adminAnalyticsService.getSalesOverview();
+    return res.status(200).json({ data: overview });
+  } catch (err) {
+    console.error("ERROR, getSalesOverview", err);
+    return res.status(500).json({
+      message: "Unable to load sales analytics.",
+    });
+  }
+};
+
+adminController.getDashboardPage = async (_req: Request, res: Response) => {
+  try {
+    const overview = await adminAnalyticsService.getSalesOverview();
+    return res.render("dashboard", { overview });
+  } catch (err) {
+    console.error("ERROR, getDashboardPage", err);
+    return res.status(500).send("Unable to load the admin dashboard.");
+  }
+};
 
 adminController.getOrdersPage = async (req: Request, res: Response) => {
   try {
