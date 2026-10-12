@@ -28,6 +28,28 @@ const OrderStatusHistorySchema = new Schema(
   { _id: false },
 );
 
+const AiDesignSnapshotSchema = new Schema(
+  {
+    designId: {
+      type: Schema.Types.ObjectId,
+      ref: "AiCakeDesign",
+      required: true,
+    },
+    prompt: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 500,
+    },
+    imageUrl: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+  },
+  { _id: false },
+);
+
 const OrderItemSchema = new Schema(
   {
     productId: {
@@ -60,6 +82,10 @@ const OrderItemSchema = new Schema(
     },
     cakeConfiguration: {
       type: CakeConfigurationSnapshotSchema,
+      default: undefined,
+    },
+    aiDesign: {
+      type: AiDesignSnapshotSchema,
       default: undefined,
     },
   },

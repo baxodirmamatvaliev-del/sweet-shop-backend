@@ -12,17 +12,20 @@ import DeliverySlotService from "./DeliverySlot.service";
 import orderTrackingService, {
   OrderTrackingSnapshot,
 } from "./OrderTracking.service";
+import AiCakeDesignService from "./AiCakeDesign.service";
 
 type CreateOrderItemInput = {
   productId?: unknown;
   quantity?: unknown;
   cakeConfiguration?: unknown;
+  aiDesignId?: unknown;
 };
 
 type NormalizedOrderItem = {
   productId: string;
   quantity: number;
   cakeConfiguration?: unknown;
+  aiDesignId?: string;
 };
 
 type CreateOrderInput = {
@@ -43,6 +46,7 @@ const convertLegacyPriceToUSD = (price: number): number =>
 
 const cakePricingService = new CakePricingService();
 const deliverySlotService = new DeliverySlotService();
+const aiCakeDesignService = new AiCakeDesignService();
 
 class OrderService {
   public async cancelMyOrder(memberId: string, orderId: string): Promise<any> {
@@ -230,12 +234,25 @@ class OrderService {
       }
 
       if (item.cakeConfiguration !== undefined) {
+        if (
+          item.aiDesignId !== undefined &&
+          (typeof item.aiDesignId !== "string" ||
+            !mongoose.isValidObjectId(item.aiDesignId))
+        ) {
+          throw new Errors(HttpCode.BAD_REQUEST, Message.AI_DESIGN_NOT_FOUND);
+        }
         customizedItems.push({
           productId,
           quantity,
           cakeConfiguration: item.cakeConfiguration,
+          ...(typeof item.aiDesignId === "string"
+            ? { aiDesignId: item.aiDesignId }
+            : {}),
         });
       } else {
+        if (item.aiDesignId !== undefined) {
+          throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_ORDER);
+        }
         quantities.set(productId, (quantities.get(productId) ?? 0) + quantity);
       }
     }
@@ -283,6 +300,9 @@ class OrderService {
             basePrice,
             item.cakeConfiguration,
           );
+          const aiDesign = item.aiDesignId
+            ? await aiCakeDesignService.getOwnedDesign(memberId, item.aiDesignId)
+            : null;
 
           return {
             productId: product._id,
@@ -294,6 +314,15 @@ class OrderService {
               cakeConfiguration.finalPrice * item.quantity,
             ),
             cakeConfiguration,
+            ...(aiDesign
+              ? {
+                  aiDesign: {
+                    designId: aiDesign._id,
+                    prompt: aiDesign.prompt,
+                    imageUrl: aiDesign.imageUrl,
+                  },
+                }
+              : {}),
           };
         }
 

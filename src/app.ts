@@ -10,6 +10,7 @@ import orderRouter from "./routes/Order.route";
 import quickOrderRouter from "./routes/QuickOrder.route";
 import deliverySlotRouter from "./routes/DeliverySlot.route";
 import cakeOptionRouter from "./routes/CakeOption.route";
+import aiCakeDesignRouter from "./routes/AiCakeDesign.route";
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use("/orders", orderRouter);
 app.use("/quick-orders", quickOrderRouter);
 app.use("/delivery-slots", deliverySlotRouter);
 app.use("/cake-options", cakeOptionRouter);
+app.use("/ai-cake-designs", aiCakeDesignRouter);
 
 
 export default app;

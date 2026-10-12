@@ -5,6 +5,9 @@ export enum HttpCode {
   NOT_FOUND = 404,
   NOT_MODIFIED = 304,
   INTERNAL_SERVER_ERROR = 500,
+  TOO_MANY_REQUESTS = 429,
+  BAD_GATEWAY = 502,
+  SERVICE_UNAVAILABLE = 503,
 }
 
 export enum Message {
@@ -24,6 +27,10 @@ export enum Message {
   INVALID_CAKE_CONFIGURATION = "Please provide a valid cake configuration.",
   INVALID_CAKE_OPTION = "Please provide valid cake option details.",
   USED_CAKE_OPTION_CODE = "This cake option code is already in use.",
+  INVALID_AI_DESIGN_PROMPT = "Describe your cake idea in 10 to 500 characters.",
+  AI_DESIGN_LIMIT_REACHED = "Daily AI design limit reached. Try again tomorrow.",
+  AI_DESIGN_UNAVAILABLE = "AI cake design is temporarily unavailable.",
+  AI_DESIGN_NOT_FOUND = "AI cake design not found.",
   INVALID_PHONE = "Enter a valid phone number in the 010-1234-5678 format.",
   INVALID_QUICK_ORDER_STATUS = "Invalid quick-order status.",
   QUICK_ORDER_NOT_FOUND = "Quick-order request not found.",
