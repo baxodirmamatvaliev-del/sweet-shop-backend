@@ -1,21 +1,24 @@
 import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import Errors, { HttpCode, Message } from "../libs/Errors";
 
 export const verifyAuth = (req: any, res: Response, next: NextFunction) => {
+  const message = "Please log in or sign up to purchase products.";
+
   try {
-    const token = req.cookies["accessToken"];
-    if (token) {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET as string); 
-      req.member = decoded;
+    const token = req.cookies?.accessToken;
+    if (typeof token !== "string" || !token) {
+      return res.status(401).json({ message });
     }
-    if (!req.member) {
-      throw new Errors(HttpCode.UNAUTHORIZED, Message.NOT_AUTHENTICATED);
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
+    if (typeof decoded === "string" || typeof decoded._id !== "string" || !/^[a-f0-9]{24}$/i.test(decoded._id)) {
+      return res.status(401).json({ message });
     }
-    next();
-    
-  } catch (err) {
-    console.log("ERROR, verifyAuth:", err);
-    res.status(401).json({ message: "Please sign in first." });
+
+    req.member = decoded;
+  } catch {
+    return res.status(401).json({ message });
   }
+
+  next();
 };

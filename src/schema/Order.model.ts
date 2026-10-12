@@ -1,4 +1,31 @@
 import mongoose, { Schema } from "mongoose";
+import { OrderStatus } from "../libs/enums/order.enum";
+
+const OrderStatusHistorySchema = new Schema(
+  {
+    status: {
+      type: String,
+      enum: Object.values(OrderStatus),
+      required: true,
+    },
+    changedAt: {
+      type: Date,
+      default: Date.now,
+      required: true,
+    },
+    changedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "Member",
+      required: true,
+    },
+    source: {
+      type: String,
+      enum: ["CUSTOMER", "ADMIN"],
+      required: true,
+    },
+  },
+  { _id: false },
+);
 
 const OrderItemSchema = new Schema(
   {
@@ -87,9 +114,13 @@ const OrderSchema = new Schema(
     },
     orderStatus: {
       type: String,
-      enum: ["PENDING", "PROCESS", "DELIVERED", "CANCELLED"],
-      default: "PENDING",
+      enum: Object.values(OrderStatus),
+      default: OrderStatus.PENDING,
       index: true,
+    },
+    statusHistory: {
+      type: [OrderStatusHistorySchema],
+      default: [],
     },
   },
   { timestamps: true },

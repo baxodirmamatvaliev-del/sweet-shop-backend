@@ -26,11 +26,12 @@ adminController.getOrdersPage = async (req: Request, res: Response) => {
   }
 };
 
-adminController.updateOrderStatus = async (req: Request, res: Response) => {
+adminController.updateOrderStatus = async (req: any, res: Response) => {
   try {
     const order = await orderService.updateOrderStatus(
       req.params.id as string,
       req.body.status,
+      req.member._id,
     );
     return res.status(200).json({
       message: "Order status updated successfully.",

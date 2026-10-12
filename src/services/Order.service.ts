@@ -3,6 +3,7 @@ import Errors, { HttpCode, Message } from "../libs/Errors";
 import ProductModel from "../schema/Product.model";
 import OrderModel from "../schema/Order.model";
 import { ProductStatus } from "../libs/enums/product.enum";
+import { OrderStatus } from "../libs/enums/order.enum";
 
 type CreateOrderItemInput = {
   productId?: unknown;
@@ -15,8 +16,6 @@ type CreateOrderInput = {
   address?: unknown;
   items?: unknown;
 };
-
-type OrderStatus = "PENDING" | "PROCESS" | "DELIVERED" | "CANCELLED";
 
 const FREE_DELIVERY_LIMIT = 100;
 const DELIVERY_FEE = 5;
@@ -36,9 +35,19 @@ class OrderService {
       {
         _id: orderId,
         memberId,
-        orderStatus: "PENDING",
+        orderStatus: OrderStatus.PENDING,
       },
-      { orderStatus: "CANCELLED" },
+      {
+        $set: { orderStatus: OrderStatus.CANCELLED },
+        $push: {
+          statusHistory: {
+            status: OrderStatus.CANCELLED,
+            changedAt: new Date(),
+            changedBy: memberId,
+            source: "CUSTOMER",
+          },
+        },
+      },
       { new: true, runValidators: true },
     )
       .lean()
@@ -61,16 +70,24 @@ class OrderService {
       .exec();
   }
 
-  public async updateOrderStatus(id: string, status: unknown): Promise<any> {
+  public async updateOrderStatus(
+    id: string,
+    status: unknown,
+    adminId: string,
+  ): Promise<any> {
     const allowedStatuses: OrderStatus[] = [
-      "PENDING",
-      "PROCESS",
-      "DELIVERED",
-      "CANCELLED",
+      OrderStatus.PENDING,
+      OrderStatus.CONFIRMED,
+      OrderStatus.BAKING,
+      OrderStatus.DECORATING,
+      OrderStatus.OUT_FOR_DELIVERY,
+      OrderStatus.DELIVERED,
+      OrderStatus.CANCELLED,
     ];
 
     if (
       !mongoose.isValidObjectId(id) ||
+      !mongoose.isValidObjectId(adminId) ||
       typeof status !== "string" ||
       !allowedStatuses.includes(status as OrderStatus)
     ) {
@@ -79,8 +96,18 @@ class OrderService {
 
     const order = await OrderModel.findByIdAndUpdate(
       id,
-      { orderStatus: status },
-      { new: true },
+      {
+        $set: { orderStatus: status },
+        $push: {
+          statusHistory: {
+            status,
+            changedAt: new Date(),
+            changedBy: adminId,
+            source: "ADMIN",
+          },
+        },
+      },
+      { new: true, runValidators: true },
     )
       .lean()
       .exec();
@@ -165,6 +192,14 @@ class OrderService {
       subtotal,
       deliveryFee,
       total: roundMoney(subtotal + deliveryFee),
+      statusHistory: [
+        {
+          status: OrderStatus.PENDING,
+          changedAt: new Date(),
+          changedBy: memberId,
+          source: "CUSTOMER",
+        },
+      ],
     });
   }
 
