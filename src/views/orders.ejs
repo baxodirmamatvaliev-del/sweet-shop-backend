@@ -66,6 +66,12 @@
                 <td>
                   <strong><%= order.customerName %></strong><br>
                   <small><%= order.address %></small>
+                  <% if (order.deliveryDate) { %>
+                    <div class="order-delivery-window">
+                      <strong><%= order.deliveryDate %></strong>
+                      <span><%= order.deliveryStartTime %>–<%= order.deliveryEndTime %></span>
+                    </div>
+                  <% } %>
                 </td>
                 <td><a href="tel:<%= order.phone %>"><%= order.phone %></a></td>
                 <td>

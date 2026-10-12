@@ -11,6 +11,7 @@ import AdminAnalyticsService from "../services/AdminAnalytics.service";
 import CakeOptionService from "../services/CakeOption.service";
 import { CakeOptionType } from "../libs/enums/cake.enum";
 import { ProductCategory } from "../libs/enums/product.enum";
+import DeliverySlotService from "../services/DeliverySlot.service";
 
 const memberService = new MemberService();
 
@@ -19,6 +20,7 @@ const quickOrderService = new QuickOrderService();
 const orderService = new OrderService();
 const adminAnalyticsService = new AdminAnalyticsService();
 const cakeOptionService = new CakeOptionService();
+const deliverySlotService = new DeliverySlotService();
 
 const parseProductInput = (body: any) => {
   const productName = String(body.productName ?? "").trim();
@@ -152,6 +154,64 @@ adminController.getQuickOrdersPage = async (req: Request, res: Response) => {
   } catch (err) {
     console.error("ERROR, getQuickOrdersPage", err);
     res.status(500).send("Unable to load quick-order requests.");
+  }
+};
+
+adminController.getDeliverySlotsPage = async (_req: Request, res: Response) => {
+  try {
+    const slots = await deliverySlotService.getAdminSlots();
+    return res.render("delivery-slots", {
+      slots,
+      createError: null,
+      formData: {},
+    });
+  } catch (err) {
+    console.error("ERROR, getDeliverySlotsPage", err);
+    return res.status(500).send("Unable to load delivery slots.");
+  }
+};
+
+adminController.createDeliverySlot = async (req: Request, res: Response) => {
+  try {
+    await deliverySlotService.createSlot(req.body);
+    return res.redirect("/admin/delivery-slots");
+  } catch (err: any) {
+    const slots = await deliverySlotService.getAdminSlots().catch(() => []);
+    return res.status(err.code ?? 400).render("delivery-slots", {
+      slots,
+      createError: err.message ?? Message.INVALID_DELIVERY_SLOT,
+      formData: req.body,
+    });
+  }
+};
+
+adminController.updateDeliverySlot = async (req: Request, res: Response) => {
+  try {
+    await deliverySlotService.updateSlot(req.params.id as string, req.body);
+    return res.redirect("/admin/delivery-slots");
+  } catch (err: any) {
+    console.error("ERROR, updateDeliverySlot", err);
+    return res.status(err.code ?? 400).send(
+      err.message ?? Message.INVALID_DELIVERY_SLOT,
+    );
+  }
+};
+
+adminController.updateDeliverySlotStatus = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    await deliverySlotService.updateActiveStatus(
+      req.params.id as string,
+      req.body.isActive === "true",
+    );
+    return res.redirect("/admin/delivery-slots");
+  } catch (err: any) {
+    console.error("ERROR, updateDeliverySlotStatus", err);
+    return res.status(err.code ?? 400).send(
+      err.message ?? Message.INVALID_DELIVERY_SLOT,
+    );
   }
 };
 

@@ -19,6 +19,8 @@ export enum Message {
   INVALID_ORDER_STATUS = "Invalid order status.",
   ORDER_NOT_FOUND = "Order not found.",
   ORDER_CANNOT_BE_CANCELLED = "Only pending orders can be cancelled.",
+  INVALID_DELIVERY_SLOT = "Please select a valid delivery slot.",
+  DELIVERY_SLOT_UNAVAILABLE = "This delivery slot is no longer available.",
   INVALID_CAKE_CONFIGURATION = "Please provide a valid cake configuration.",
   INVALID_CAKE_OPTION = "Please provide valid cake option details.",
   USED_CAKE_OPTION_CODE = "This cake option code is already in use.",

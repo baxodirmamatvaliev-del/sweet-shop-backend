@@ -8,6 +8,7 @@ import {
 } from "../libs/enums/product.enum";
 import { OrderStatus } from "../libs/enums/order.enum";
 import CakePricingService from "./CakePricing.service";
+import DeliverySlotService from "./DeliverySlot.service";
 
 type CreateOrderItemInput = {
   productId?: unknown;
@@ -25,6 +26,7 @@ type CreateOrderInput = {
   customerName?: unknown;
   phone?: unknown;
   address?: unknown;
+  deliverySlotId?: unknown;
   items?: unknown;
 };
 
@@ -37,6 +39,7 @@ const convertLegacyPriceToUSD = (price: number): number =>
   price >= 1000 ? price / 1000 : price;
 
 const cakePricingService = new CakePricingService();
+const deliverySlotService = new DeliverySlotService();
 
 class OrderService {
   public async cancelMyOrder(memberId: string, orderId: string): Promise<any> {
@@ -66,7 +69,14 @@ class OrderService {
       .lean()
       .exec();
 
-    if (order) return order;
+    if (order) {
+      await deliverySlotService
+        .releaseSlot(order.deliverySlotId)
+        .catch((error: unknown) => {
+          console.error("Unable to release cancelled order delivery slot:", error);
+        });
+      return order;
+    }
 
     const existingOrder = await OrderModel.exists({ _id: orderId, memberId }).exec();
     if (!existingOrder) {
@@ -247,25 +257,34 @@ class OrderService {
       orderItems.reduce((sum, item) => sum + item.itemTotal, 0),
     );
     const deliveryFee = subtotal >= FREE_DELIVERY_LIMIT ? 0 : DELIVERY_FEE;
+    const deliverySlot = await deliverySlotService.reserveSlot(
+      input.deliverySlotId,
+    );
 
-    return OrderModel.create({
-      memberId,
-      customerName,
-      phone,
-      address,
-      items: orderItems,
-      subtotal,
-      deliveryFee,
-      total: roundMoney(subtotal + deliveryFee),
-      statusHistory: [
-        {
-          status: OrderStatus.PENDING,
-          changedAt: new Date(),
-          changedBy: memberId,
-          source: "CUSTOMER",
-        },
-      ],
-    });
+    try {
+      return await OrderModel.create({
+        memberId,
+        customerName,
+        phone,
+        address,
+        ...deliverySlot,
+        items: orderItems,
+        subtotal,
+        deliveryFee,
+        total: roundMoney(subtotal + deliveryFee),
+        statusHistory: [
+          {
+            status: OrderStatus.PENDING,
+            changedAt: new Date(),
+            changedBy: memberId,
+            source: "CUSTOMER",
+          },
+        ],
+      });
+    } catch (error) {
+      await deliverySlotService.releaseSlot(deliverySlot.deliverySlotId);
+      throw error;
+    }
   }
 
   private requireText(value: unknown): string {

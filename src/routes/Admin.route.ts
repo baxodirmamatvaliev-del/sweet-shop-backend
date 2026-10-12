@@ -28,6 +28,10 @@ adminRouter.get("/cake-options", verifyAdmin, adminController.getCakeOptionsPage
 adminRouter.post("/cake-options/create", verifyAdmin, adminController.createCakeOption);
 adminRouter.post("/cake-options/:id/update", verifyAdmin, adminController.updateCakeOption);
 adminRouter.post("/cake-options/:id/status", verifyAdmin, adminController.updateCakeOptionStatus);
+adminRouter.get("/delivery-slots", verifyAdmin, adminController.getDeliverySlotsPage);
+adminRouter.post("/delivery-slots/create", verifyAdmin, adminController.createDeliverySlot);
+adminRouter.post("/delivery-slots/:id/update", verifyAdmin, adminController.updateDeliverySlot);
+adminRouter.post("/delivery-slots/:id/status", verifyAdmin, adminController.updateDeliverySlotStatus);
 adminRouter.post("/logout", verifyAdmin, adminController.logout);
 
 export default adminRouter;

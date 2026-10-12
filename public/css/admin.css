@@ -1120,6 +1120,126 @@ table.products-table {
   gap: 8px;
 }
 
+.delivery-slot-create,
+.delivery-slot-card,
+.delivery-slot-empty {
+  border: 1px solid rgba(123, 63, 0, 0.14);
+  border-radius: 16px;
+  background: #fffdf9;
+  box-shadow: 0 14px 34px rgba(102, 58, 19, 0.1);
+}
+
+.delivery-slot-create {
+  margin-bottom: 20px;
+  padding: 24px;
+}
+
+.delivery-slot-create h2 {
+  margin: 0 0 18px;
+  color: #582c0b;
+}
+
+.delivery-slot-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: 12px;
+}
+
+.delivery-slot-form input,
+.delivery-slot-card input {
+  margin-bottom: 0;
+}
+
+.delivery-slot-help {
+  margin: 14px 0 0;
+  color: #80644e;
+  font-size: 13px;
+}
+
+.delivery-slot-list {
+  display: grid;
+  gap: 12px;
+}
+
+.delivery-slot-empty {
+  padding: 36px;
+  color: #765943;
+  text-align: center;
+}
+
+.delivery-slot-card {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) 90px auto;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+}
+
+.delivery-slot-card__date,
+.delivery-slot-card__capacity {
+  display: grid;
+  gap: 4px;
+}
+
+.delivery-slot-card__date strong,
+.delivery-slot-card__capacity strong {
+  color: #582c0b;
+  font-size: 19px;
+}
+
+.delivery-slot-card__date span,
+.delivery-slot-card__capacity span {
+  color: #876c56;
+  font-size: 12px;
+}
+
+.delivery-slot-card__form {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 0.8fr 0.8fr auto;
+  align-items: end;
+  gap: 8px;
+}
+
+.delivery-slot-card__form label {
+  font-size: 12px;
+}
+
+.delivery-slot-card__status {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+}
+
+.order-delivery-window {
+  display: grid;
+  gap: 2px;
+  margin-top: 8px;
+  padding: 7px 9px;
+  border-radius: 8px;
+  background: #f7eadc;
+  color: #75400f;
+  font-size: 12px;
+}
+
+@media (max-width: 1180px) {
+  .delivery-slot-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .delivery-slot-card {
+    grid-template-columns: 100px minmax(0, 1fr);
+  }
+
+  .delivery-slot-card__form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .delivery-slot-card__status {
+    justify-items: start;
+  }
+}
+
 @media (max-width: 1180px) {
   .cake-option-form {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1334,5 +1454,15 @@ table.products-table {
   .cake-option-card__preview {
     width: 100%;
     height: 130px;
+  }
+
+  .delivery-slot-form,
+  .delivery-slot-card,
+  .delivery-slot-card__form {
+    grid-template-columns: 1fr;
+  }
+
+  .delivery-slot-card__status {
+    justify-items: stretch;
   }
 }

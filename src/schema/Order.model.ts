@@ -89,6 +89,27 @@ const OrderSchema = new Schema(
       required: true,
       trim: true,
     },
+    deliverySlotId: {
+      type: Schema.Types.ObjectId,
+      ref: "DeliverySlot",
+      required: true,
+      index: true,
+    },
+    deliveryDate: {
+      type: String,
+      match: /^\d{4}-\d{2}-\d{2}$/,
+      required: true,
+    },
+    deliveryStartTime: {
+      type: String,
+      match: /^([01]\d|2[0-3]):[0-5]\d$/,
+      required: true,
+    },
+    deliveryEndTime: {
+      type: String,
+      match: /^([01]\d|2[0-3]):[0-5]\d$/,
+      required: true,
+    },
     items: {
       type: [OrderItemSchema],
       required: true,

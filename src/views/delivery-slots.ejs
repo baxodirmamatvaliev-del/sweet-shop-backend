@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sweet Shop Admin - Delivery slots</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-page">
+  <%- include('includes/header') %>
+
+  <main class="container products-page">
+    <div class="page-heading">
+      <div>
+        <p class="eyebrow">Admin panel</p>
+        <h1>Delivery Scheduler</h1>
+        <p class="page-description">Create delivery windows and manage their capacity.</p>
+      </div>
+    </div>
+
+    <section class="delivery-slot-create">
+      <h2>Create delivery slot</h2>
+      <% if (createError) { %>
+        <div class="create-form-error" role="alert"><%= createError %></div>
+      <% } %>
+      <form action="/admin/delivery-slots/create" method="POST" class="delivery-slot-form">
+        <label>Date
+          <input id="deliverySlotDate" type="date" name="date" value="<%= formData.date || '' %>" required>
+        </label>
+        <label>Start time
+          <input type="time" name="startTime" value="<%= formData.startTime || '' %>" required>
+        </label>
+        <label>End time
+          <input type="time" name="endTime" value="<%= formData.endTime || '' %>" required>
+        </label>
+        <label>Capacity
+          <input type="number" name="capacity" min="1" step="1" value="<%= formData.capacity || 1 %>" required>
+        </label>
+        <button class="btn-create" type="submit">Create slot</button>
+      </form>
+      <p class="delivery-slot-help">Slots must start at least 24 hours from now and no more than 90 days ahead.</p>
+    </section>
+
+    <section class="delivery-slot-list" aria-label="Upcoming delivery slots">
+      <% if (slots.length === 0) { %>
+        <div class="delivery-slot-empty">No upcoming delivery slots.</div>
+      <% } %>
+      <% slots.forEach(function(slot) { %>
+        <article class="delivery-slot-card">
+          <div class="delivery-slot-card__date">
+            <strong><%= new Date(`${slot.date}T00:00:00+09:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) %></strong>
+            <span><%= slot.date %></span>
+          </div>
+          <form action="/admin/delivery-slots/<%= slot._id %>/update" method="POST" class="delivery-slot-card__form">
+            <input type="date" name="date" value="<%= slot.date %>" aria-label="Delivery date" required>
+            <input type="time" name="startTime" value="<%= slot.startTime %>" aria-label="Start time" required>
+            <input type="time" name="endTime" value="<%= slot.endTime %>" aria-label="End time" required>
+            <label>Capacity
+              <input type="number" name="capacity" min="<%= Math.max(1, slot.reservedCount) %>" step="1" value="<%= slot.capacity %>" required>
+            </label>
+            <button class="btn-primary" type="submit">Save</button>
+          </form>
+          <div class="delivery-slot-card__capacity">
+            <strong><%= slot.reservedCount %> / <%= slot.capacity %></strong>
+            <span>reserved</span>
+          </div>
+          <form action="/admin/delivery-slots/<%= slot._id %>/status" method="POST" class="delivery-slot-card__status">
+            <input type="hidden" name="isActive" value="<%= slot.isActive ? 'false' : 'true' %>">
+            <span class="status-badge <%= slot.isActive ? 'status-active' : 'status-delete' %>"><%= slot.isActive ? 'Active' : 'Inactive' %></span>
+            <button class="btn-status-toggle" type="submit"><%= slot.isActive ? 'Disable' : 'Enable' %></button>
+          </form>
+        </article>
+      <% }); %>
+    </section>
+  </main>
+
+  <script>
+    const dateInput = document.getElementById("deliverySlotDate");
+    const seoulTomorrow = new Date(Date.now() + 33 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+    dateInput.min = seoulTomorrow;
+  </script>
+</body>
+</html>
