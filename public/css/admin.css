@@ -496,11 +496,11 @@ body.admin-page .container {
 
 .navbar {
   width: min(calc(100% - 48px), 1440px);
-  height: 72px;
+  min-height: 72px;
   margin: 24px auto 0;
   border-radius: 16px;
   background: rgba(91, 54, 22, 0.94);
-  padding: 0 32px;
+  padding: 12px 32px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -517,6 +517,8 @@ body.admin-page .container {
 .navbar-links {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -732,6 +734,91 @@ table.products-table {
   color: #665c54;
 }
 
+.status-pending {
+  background: #fff0cf;
+  color: #865700;
+}
+
+.status-confirmed,
+.status-baking,
+.status-decorating {
+  background: #e7edff;
+  color: #294f9f;
+}
+
+.status-out-for-delivery {
+  background: #e0f4f4;
+  color: #176c71;
+}
+
+.status-delivered {
+  background: #def4e4;
+  color: #1f7136;
+}
+
+.status-cancelled {
+  background: #fde3df;
+  color: #a52d24;
+}
+
+.inventory-value {
+  display: block;
+  color: #5d4735;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.inventory-value--low {
+  color: #b03627;
+}
+
+.inventory-toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 8px 0 16px;
+}
+
+.inventory-toggle input {
+  width: 18px;
+  height: 18px;
+}
+
+.inventory-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.order-history {
+  min-width: 190px;
+  margin-top: 9px;
+  color: #75543b;
+  font-size: 12px;
+}
+
+.order-history summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.order-history ol {
+  display: grid;
+  gap: 8px;
+  margin: 9px 0 0;
+  padding-left: 18px;
+}
+
+.order-history li strong,
+.order-history li span {
+  display: block;
+}
+
+.order-history li span {
+  margin-top: 2px;
+  color: #92735a;
+}
+
 .empty-table {
   padding: 36px !important;
   color: #765943 !important;
@@ -885,7 +972,7 @@ table.products-table {
 
 .dashboard-metrics {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 16px;
   margin-bottom: 20px;
 }
@@ -937,6 +1024,121 @@ table.products-table {
 .dashboard-metric--accent strong,
 .dashboard-metric--accent small {
   color: #fff7eb;
+}
+
+.dashboard-metric--warning {
+  border-color: #dca451;
+  background: #fff3d9;
+}
+
+.cake-option-create,
+.cake-option-card {
+  border: 1px solid rgba(123, 63, 0, 0.14);
+  border-radius: 16px;
+  background: #fffdf9;
+  box-shadow: 0 14px 34px rgba(102, 58, 19, 0.1);
+}
+
+.cake-option-create {
+  margin-bottom: 20px;
+  padding: 24px;
+}
+
+.cake-option-create h2 {
+  margin: 0 0 18px;
+  color: #582c0b;
+}
+
+.cake-option-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: end;
+  gap: 12px;
+}
+
+.cake-option-form label,
+.cake-option-card__form {
+  min-width: 0;
+}
+
+.cake-option-form input,
+.cake-option-form select,
+.cake-option-form textarea,
+.cake-option-card input,
+.cake-option-card select,
+.cake-option-card textarea {
+  margin-bottom: 0;
+}
+
+.cake-option-form__wide {
+  grid-column: span 2;
+}
+
+.cake-option-list {
+  display: grid;
+  gap: 14px;
+}
+
+.cake-option-card {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+}
+
+.cake-option-card__preview {
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  border: 1px solid rgba(93, 52, 18, 0.16);
+  border-radius: 14px;
+  background: var(--option-color);
+}
+
+.cake-option-card__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cake-option-card__form {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.4fr 0.8fr 0.7fr 1fr 1.4fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.cake-option-card__form textarea {
+  min-height: 40px;
+  resize: vertical;
+}
+
+.cake-option-card__status {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+}
+
+@media (max-width: 1180px) {
+  .cake-option-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cake-option-card {
+    grid-template-columns: 64px minmax(0, 1fr);
+  }
+
+  .cake-option-card__form {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .cake-option-card__status {
+    grid-column: 2;
+    justify-items: start;
+    grid-auto-flow: column;
+    justify-content: start;
+  }
 }
 
 .dashboard-layout {
@@ -1115,5 +1317,22 @@ table.products-table {
 
   .dashboard-chart {
     gap: 5px;
+  }
+
+  .inventory-fields,
+  .cake-option-form,
+  .cake-option-card,
+  .cake-option-card__form {
+    grid-template-columns: 1fr;
+  }
+
+  .cake-option-form__wide,
+  .cake-option-card__status {
+    grid-column: auto;
+  }
+
+  .cake-option-card__preview {
+    width: 100%;
+    height: 130px;
   }
 }

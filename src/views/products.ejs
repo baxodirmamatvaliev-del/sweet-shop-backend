@@ -35,6 +35,7 @@
           <th>Category</th>
           <th>Price</th>
           <th>Views</th>
+          <th>Inventory</th>
           <th>Status</th>
           <th>Image</th>
           <th>Actions</th>
@@ -47,6 +48,16 @@
             <td><%= product.productCategory %></td>
             <td><%= product.productPrice %> UZS</td>
             <td><%= product.productViews %></td>
+            <td>
+              <% if (product.trackInventory) { %>
+                <span class="inventory-value <%= product.inventoryQuantity <= product.lowStockThreshold ? 'inventory-value--low' : '' %>">
+                  <%= product.inventoryQuantity %> units
+                </span>
+                <small>Low at <%= product.lowStockThreshold %></small>
+              <% } else { %>
+                <span class="inventory-value">Not tracked</span>
+              <% } %>
+            </td>
             <td><%= product.productStatus %></td>
             <td>
               <% if (product.productImage) { %>
@@ -72,6 +83,9 @@
                 data-product-category="<%= product.productCategory %>"
                 data-product-desc="<%= product.productDesc || '' %>"
                 data-product-image="<%= product.productImage || '' %>"
+                data-product-track-inventory="<%= Boolean(product.trackInventory) %>"
+                data-product-inventory-quantity="<%= product.inventoryQuantity ?? 0 %>"
+                data-product-low-stock-threshold="<%= product.lowStockThreshold ?? 5 %>"
                 onclick="openEditForm(this)"
               >Edit</button>
               <div class="status-dropdown">
@@ -126,6 +140,19 @@
         <label for="editProductDesc">Description:</label>
         <textarea id="editProductDesc" name="productDesc"></textarea>
 
+        <label class="inventory-toggle" for="editTrackInventory">
+          <input id="editTrackInventory" type="checkbox" name="trackInventory">
+          Track inventory for this product
+        </label>
+
+        <div class="inventory-fields">
+          <label for="editInventoryQuantity">Inventory quantity:</label>
+          <input id="editInventoryQuantity" type="number" name="inventoryQuantity" min="0" step="1" required>
+
+          <label for="editLowStockThreshold">Low-stock threshold:</label>
+          <input id="editLowStockThreshold" type="number" name="lowStockThreshold" min="0" step="1" required>
+        </div>
+
         <label for="editProductImage">New image (optional):</label>
         <input id="editProductImage" type="file" name="productImage" accept="image/png,image/jpeg,image/webp">
         <small id="currentProductImage"></small>
@@ -163,6 +190,19 @@
 
         <label>Description:</label>
         <textarea name="productDesc"><%= formData.productDesc || '' %></textarea>
+
+        <label class="inventory-toggle">
+          <input type="checkbox" name="trackInventory" <%= formData.trackInventory ? 'checked' : '' %>>
+          Track inventory for this product
+        </label>
+
+        <div class="inventory-fields">
+          <label>Inventory quantity:</label>
+          <input type="number" name="inventoryQuantity" min="0" step="1" value="<%= formData.inventoryQuantity ?? 0 %>" required>
+
+          <label>Low-stock threshold:</label>
+          <input type="number" name="lowStockThreshold" min="0" step="1" value="<%= formData.lowStockThreshold ?? 5 %>" required>
+        </div>
 
         <label>Image:</label>
         <div class="image-upload" id="imageUpload">
@@ -209,6 +249,9 @@
       document.getElementById("editProductPrice").value = button.dataset.productPrice;
       document.getElementById("editProductCategory").value = button.dataset.productCategory;
       document.getElementById("editProductDesc").value = button.dataset.productDesc;
+      document.getElementById("editTrackInventory").checked = button.dataset.productTrackInventory === "true";
+      document.getElementById("editInventoryQuantity").value = button.dataset.productInventoryQuantity;
+      document.getElementById("editLowStockThreshold").value = button.dataset.productLowStockThreshold;
       document.getElementById("editProductImage").value = "";
       document.getElementById("currentProductImage").textContent = button.dataset.productImage
         ? `Current image: ${button.dataset.productImage}`

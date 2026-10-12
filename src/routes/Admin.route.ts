@@ -24,6 +24,10 @@ adminRouter.get("/orders", verifyAdmin, adminController.getOrdersPage);
 adminRouter.patch("/orders/:id/status", verifyAdmin, adminController.updateOrderStatus);
 adminRouter.get("/quick-orders", verifyAdmin, adminController.getQuickOrdersPage);
 adminRouter.post("/quick-orders/:id/status", verifyAdmin, adminController.updateQuickOrderStatus);
+adminRouter.get("/cake-options", verifyAdmin, adminController.getCakeOptionsPage);
+adminRouter.post("/cake-options/create", verifyAdmin, adminController.createCakeOption);
+adminRouter.post("/cake-options/:id/update", verifyAdmin, adminController.updateCakeOption);
+adminRouter.post("/cake-options/:id/status", verifyAdmin, adminController.updateCakeOptionStatus);
 adminRouter.post("/logout", verifyAdmin, adminController.logout);
 
 export default adminRouter;

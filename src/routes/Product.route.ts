@@ -1,6 +1,6 @@
 import { Router } from "express";
 import productController from "../controllers/Product.controller";
-import { verifyAuth } from "../middlewares/auth.middleware";
+import { verifyAdmin } from "../middlewares/admin.middleware";
 
 const productRouter = Router();
 
@@ -14,6 +14,6 @@ productRouter
 
 // Create a new product
 productRouter
-.post("/", verifyAuth, productController.createProduct); 
+.post("/", verifyAdmin, productController.createProduct);
 
 export default productRouter;

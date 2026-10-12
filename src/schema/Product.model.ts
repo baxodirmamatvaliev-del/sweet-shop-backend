@@ -38,6 +38,26 @@ const ProductSchema = new Schema(
       type: Number,
       default: 0,
     },
+
+    trackInventory: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+
+    inventoryQuantity: {
+      type: Number,
+      min: 0,
+      default: 0,
+      validate: Number.isInteger,
+    },
+
+    lowStockThreshold: {
+      type: Number,
+      min: 0,
+      default: 5,
+      validate: Number.isInteger,
+    },
   },
   { timestamps: true }
 );

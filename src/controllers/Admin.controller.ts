@@ -8,6 +8,9 @@ import path from "path";
 import QuickOrderService from "../services/QuickOrder.service";
 import OrderService from "../services/Order.service";
 import AdminAnalyticsService from "../services/AdminAnalytics.service";
+import CakeOptionService from "../services/CakeOption.service";
+import { CakeOptionType } from "../libs/enums/cake.enum";
+import { ProductCategory } from "../libs/enums/product.enum";
 
 const memberService = new MemberService();
 
@@ -15,6 +18,79 @@ const productService = new ProductService();
 const quickOrderService = new QuickOrderService();
 const orderService = new OrderService();
 const adminAnalyticsService = new AdminAnalyticsService();
+const cakeOptionService = new CakeOptionService();
+
+const parseProductInput = (body: any) => {
+  const productName = String(body.productName ?? "").trim();
+  const productPrice = Number(body.productPrice);
+  const productCategory = String(body.productCategory ?? "");
+  const productDesc = String(body.productDesc ?? "").trim();
+  const trackInventory =
+    body.trackInventory === true ||
+    body.trackInventory === "true" ||
+    body.trackInventory === "on";
+  const inventoryQuantity = Number(body.inventoryQuantity ?? 0);
+  const lowStockThreshold = Number(body.lowStockThreshold ?? 5);
+
+  if (
+    !productName ||
+    !Number.isFinite(productPrice) ||
+    productPrice < 0 ||
+    !Object.values(ProductCategory).includes(
+      productCategory as ProductCategory,
+    ) ||
+    !Number.isInteger(inventoryQuantity) ||
+    inventoryQuantity < 0 ||
+    !Number.isInteger(lowStockThreshold) ||
+    lowStockThreshold < 0
+  ) {
+    throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_PRODUCT);
+  }
+
+  return {
+    productName,
+    productPrice,
+    productCategory,
+    productDesc,
+    trackInventory,
+    inventoryQuantity,
+    lowStockThreshold,
+  };
+};
+
+const parseCakeOptionInput = (body: any) => {
+  const optionType = String(body.optionType ?? "");
+  const code = String(body.code ?? "").trim().toUpperCase();
+  const name = String(body.name ?? "").trim();
+  const description = String(body.description ?? "").trim();
+  const priceModifier = Number(body.priceModifier ?? 0);
+  const previewImage = String(body.previewImage ?? "").trim();
+  const previewColor = String(body.previewColor ?? "").trim();
+  const sortOrder = Number(body.sortOrder ?? 0);
+
+  if (
+    !Object.values(CakeOptionType).includes(optionType as CakeOptionType) ||
+    !/^[A-Z0-9_-]{2,40}$/.test(code) ||
+    !name ||
+    !Number.isFinite(priceModifier) ||
+    priceModifier < 0 ||
+    !Number.isInteger(sortOrder) ||
+    sortOrder < 0
+  ) {
+    throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_CAKE_OPTION);
+  }
+
+  return {
+    optionType,
+    code,
+    name,
+    description,
+    priceModifier,
+    previewImage,
+    previewColor,
+    sortOrder,
+  };
+};
 
 const adminController: any = {};
 
@@ -79,6 +155,69 @@ adminController.getQuickOrdersPage = async (req: Request, res: Response) => {
   }
 };
 
+adminController.getCakeOptionsPage = async (_req: Request, res: Response) => {
+  try {
+    const options = await cakeOptionService.getOptions();
+    return res.render("cake-options", {
+      options,
+      optionTypes: Object.values(CakeOptionType),
+      createError: null,
+      formData: {},
+    });
+  } catch (err) {
+    console.error("ERROR, getCakeOptionsPage", err);
+    return res.status(500).send("Unable to load cake options.");
+  }
+};
+
+adminController.createCakeOption = async (req: Request, res: Response) => {
+  try {
+    await cakeOptionService.createOption(parseCakeOptionInput(req.body));
+    return res.redirect("/admin/cake-options");
+  } catch (err: any) {
+    const options = await cakeOptionService.getOptions().catch(() => []);
+    return res.status(err.code ?? 400).render("cake-options", {
+      options,
+      optionTypes: Object.values(CakeOptionType),
+      createError: err.message ?? Message.INVALID_CAKE_OPTION,
+      formData: req.body,
+    });
+  }
+};
+
+adminController.updateCakeOption = async (req: Request, res: Response) => {
+  try {
+    await cakeOptionService.updateOption(
+      req.params.id as string,
+      parseCakeOptionInput(req.body),
+    );
+    return res.redirect("/admin/cake-options");
+  } catch (err: any) {
+    console.error("ERROR, updateCakeOption", err);
+    return res.status(err.code ?? 400).send(
+      err.message ?? Message.INVALID_CAKE_OPTION,
+    );
+  }
+};
+
+adminController.updateCakeOptionStatus = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    await cakeOptionService.updateActiveStatus(
+      req.params.id as string,
+      req.body.isActive === "true",
+    );
+    return res.redirect("/admin/cake-options");
+  } catch (err: any) {
+    console.error("ERROR, updateCakeOptionStatus", err);
+    return res.status(err.code ?? 400).send(
+      err.message ?? Message.INVALID_CAKE_OPTION,
+    );
+  }
+};
+
 adminController.updateQuickOrderStatus = async (req: Request, res: Response) => {
   try {
     await quickOrderService.updateStatus(req.params.id as string, req.body.status);
@@ -139,17 +278,7 @@ adminController.updateProductStatus = async (req: Request, res: Response) => {
 
 adminController.updateProduct = async (req: Request, res: Response) => {
   try {
-    const productName = String(req.body.productName ?? "").trim();
-    const productPrice = Number(req.body.productPrice);
-    const productCategory = String(req.body.productCategory ?? "");
-    const productDesc = String(req.body.productDesc ?? "").trim();
-
-    if (!productName || !Number.isFinite(productPrice) || productPrice < 0) {
-      if (req.file?.path) await unlink(req.file.path).catch(() => undefined);
-      return res.status(400).json({ message: "Please provide valid product details." });
-    }
-
-    const input: any = { productName, productPrice, productCategory, productDesc };
+    const input: any = parseProductInput(req.body);
     if (req.file) input.productImage = req.file.filename;
 
     const previousProduct = req.file
@@ -178,12 +307,12 @@ adminController.updateProduct = async (req: Request, res: Response) => {
 // Create a product from the admin form
 adminController.processCreateProduct = async (req: Request, res: Response) => {
   try {
-    const input = req.body;
+    const input: any = parseProductInput(req.body);
     if (req.file) {
       input.productImage = req.file.filename;
     }
     await productService.createProduct(input);
-    res.redirect("/admin/products");
+    return res.redirect("/admin/products");
   } catch (err) {
     console.error("ERROR, processCreateProduct", err);
 
@@ -196,7 +325,7 @@ adminController.processCreateProduct = async (req: Request, res: Response) => {
       ? err.message
       : Message.CREATE_FAILED;
 
-    res.status(400).render("products", {
+    return res.status(400).render("products", {
       products,
       createError,
       formData: req.body,
@@ -245,7 +374,7 @@ adminController.processLogin = async (req: Request, res: Response) => {
       maxAge: 24 * 60 * 60 * 1000,
       httpOnly: true,
     });
-    res.redirect("/admin/products");
+    res.redirect("/admin/dashboard");
   } catch (err) {
     console.error("ERROR, processLogin", err);
     res.render("login", { error: "Incorrect login or password" });

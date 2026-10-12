@@ -59,6 +59,21 @@
         <strong><%= activeOrders %></strong>
         <small>Waiting or in progress</small>
       </article>
+      <article class="dashboard-metric">
+        <span>Customers</span>
+        <strong><%= overview.totalCustomers %></strong>
+        <small>Registered customer accounts</small>
+      </article>
+      <article class="dashboard-metric">
+        <span>Active products</span>
+        <strong><%= overview.activeProducts %></strong>
+        <small>Available catalog products</small>
+      </article>
+      <article class="dashboard-metric <%= overview.lowStockProducts > 0 ? 'dashboard-metric--warning' : '' %>">
+        <span>Low stock</span>
+        <strong><%= overview.lowStockProducts %></strong>
+        <small>Tracked products at or below threshold</small>
+      </article>
     </section>
 
     <div class="dashboard-layout">

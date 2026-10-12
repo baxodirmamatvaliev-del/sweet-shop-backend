@@ -10,6 +10,28 @@
 <body class="admin-page">
   <%- include('includes/header') %>
 
+  <%
+    const orderStatusLabels = {
+      PENDING: 'Pending',
+      CONFIRMED: 'Confirmed',
+      BAKING: 'Baking',
+      DECORATING: 'Decorating',
+      OUT_FOR_DELIVERY: 'Out for delivery',
+      DELIVERED: 'Delivered',
+      CANCELLED: 'Cancelled',
+      PROCESS: 'Legacy processing',
+    };
+    const editableOrderStatuses = [
+      'PENDING',
+      'CONFIRMED',
+      'BAKING',
+      'DECORATING',
+      'OUT_FOR_DELIVERY',
+      'DELIVERED',
+      'CANCELLED',
+    ];
+  %>
+
   <main class="container products-page">
     <div class="page-heading">
       <div>
@@ -53,16 +75,27 @@
                 </td>
                 <td>$<%= Number(order.total).toFixed(2) %></td>
                 <td>
-                  <span id="status-<%= order._id %>" class="status-badge status-<%= order.orderStatus.toLowerCase() %>">
-                    <%= ({ PENDING: 'Pending', PROCESS: 'Processing', CANCELLED: 'Cancelled', DELIVERED: 'Delivered' })[order.orderStatus] || order.orderStatus %>
+                  <span id="status-<%= order._id %>" class="status-badge status-<%= order.orderStatus.toLowerCase().replaceAll('_', '-') %>">
+                    <%= orderStatusLabels[order.orderStatus] || order.orderStatus %>
                   </span>
+                  <details class="order-history">
+                    <summary>History (<%= order.statusHistory?.length || 0 %>)</summary>
+                    <ol id="history-<%= order._id %>">
+                      <% (order.statusHistory || []).forEach(function(entry) { %>
+                        <li>
+                          <strong><%= orderStatusLabels[entry.status] || entry.status %></strong>
+                          <span><%= entry.source %> · <%= new Date(entry.changedAt).toLocaleString('en-GB') %></span>
+                        </li>
+                      <% }); %>
+                    </ol>
+                  </details>
                 </td>
                 <td><%= new Date(order.createdAt).toLocaleString('en-GB') %></td>
                 <td>
                   <form class="quick-order-action order-status-form" data-order-id="<%= order._id %>">
                     <select name="status" aria-label="Order status">
-                      <% ['PENDING', 'PROCESS', 'CANCELLED', 'DELIVERED'].forEach(function(status) { %>
-                        <option value="<%= status %>" <%= order.orderStatus === status ? 'selected' : '' %>><%= ({ PENDING: 'Pending', PROCESS: 'Processing', CANCELLED: 'Cancelled', DELIVERED: 'Delivered' })[status] %></option>
+                      <% editableOrderStatuses.forEach(function(status) { %>
+                        <option value="<%= status %>" <%= order.orderStatus === status ? 'selected' : '' %>><%= orderStatusLabels[status] %></option>
                       <% }); %>
                     </select>
                     <button type="submit" class="btn-primary">Save</button>
@@ -80,7 +113,10 @@
     const message = document.getElementById("order-message");
     const orderStatusLabels = {
       PENDING: "Pending",
-      PROCESS: "Processing",
+      CONFIRMED: "Confirmed",
+      BAKING: "Baking",
+      DECORATING: "Decorating",
+      OUT_FOR_DELIVERY: "Out for delivery",
       CANCELLED: "Cancelled",
       DELIVERED: "Delivered",
     };
@@ -106,7 +142,20 @@
 
           const badge = document.getElementById(`status-${orderId}`);
           badge.textContent = orderStatusLabels[result.data.orderStatus] || result.data.orderStatus;
-          badge.className = `status-badge status-${result.data.orderStatus.toLowerCase()}`;
+          badge.className = `status-badge status-${result.data.orderStatus.toLowerCase().replaceAll("_", "-")}`;
+          const history = document.getElementById(`history-${orderId}`);
+          const latestEntry = result.data.statusHistory?.at(-1);
+          if (history && latestEntry) {
+            const item = document.createElement("li");
+            const title = document.createElement("strong");
+            const detail = document.createElement("span");
+            title.textContent = orderStatusLabels[latestEntry.status] || latestEntry.status;
+            detail.textContent = `${latestEntry.source} · ${new Date(latestEntry.changedAt).toLocaleString("en-GB")}`;
+            item.append(title, detail);
+            history.append(item);
+            const summary = history.closest("details")?.querySelector("summary");
+            if (summary) summary.textContent = `History (${history.children.length})`;
+          }
           message.textContent = result.message;
           message.className = "order-message order-message-success";
           message.hidden = false;

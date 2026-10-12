@@ -77,7 +77,11 @@ class ProductService {
 
   const id = shapeIntoMongooseObjectId(productId);
   const result = await this.productModel
-    .findByIdAndUpdate(id, { productStatus: status }, { returnDocument: "after" })
+    .findByIdAndUpdate(
+      id,
+      { productStatus: status },
+      { returnDocument: "after", runValidators: true },
+    )
     .exec();
   if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
   return result;
