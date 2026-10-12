@@ -18,6 +18,7 @@ export enum Message {
   INVALID_ORDER_STATUS = "Invalid order status.",
   ORDER_NOT_FOUND = "Order not found.",
   ORDER_CANNOT_BE_CANCELLED = "Only pending orders can be cancelled.",
+  INVALID_CAKE_CONFIGURATION = "Please provide a valid cake configuration.",
   INVALID_PHONE = "Enter a valid phone number in the 010-1234-5678 format.",
   INVALID_QUICK_ORDER_STATUS = "Invalid quick-order status.",
   QUICK_ORDER_NOT_FOUND = "Quick-order request not found.",
