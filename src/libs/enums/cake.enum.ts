@@ -1,0 +1,10 @@
+export enum CakeOptionType {
+  SIZE = "SIZE",
+  SPONGE = "SPONGE",
+  FILLING = "FILLING",
+  CREAM = "CREAM",
+  FROSTING = "FROSTING",
+  CHOCOLATE = "CHOCOLATE",
+  FRUIT = "FRUIT",
+  DECORATION = "DECORATION",
+}
