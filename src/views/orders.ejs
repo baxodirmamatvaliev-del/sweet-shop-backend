@@ -21,15 +21,16 @@
       CANCELLED: 'Cancelled',
       PROCESS: 'Legacy processing',
     };
-    const editableOrderStatuses = [
-      'PENDING',
-      'CONFIRMED',
-      'BAKING',
-      'DECORATING',
-      'OUT_FOR_DELIVERY',
-      'DELIVERED',
-      'CANCELLED',
-    ];
+    const orderStatusTransitions = {
+      PENDING: ['CONFIRMED', 'CANCELLED'],
+      PROCESS: ['CONFIRMED'],
+      CONFIRMED: ['BAKING', 'CANCELLED'],
+      BAKING: ['DECORATING', 'CANCELLED'],
+      DECORATING: ['OUT_FOR_DELIVERY', 'CANCELLED'],
+      OUT_FOR_DELIVERY: ['DELIVERED'],
+      DELIVERED: [],
+      CANCELLED: [],
+    };
   %>
 
   <main class="container products-page">
@@ -98,14 +99,20 @@
                 </td>
                 <td><%= new Date(order.createdAt).toLocaleString('en-GB') %></td>
                 <td>
-                  <form class="quick-order-action order-status-form" data-order-id="<%= order._id %>">
-                    <select name="status" aria-label="Order status">
-                      <% editableOrderStatuses.forEach(function(status) { %>
-                        <option value="<%= status %>" <%= order.orderStatus === status ? 'selected' : '' %>><%= orderStatusLabels[status] %></option>
-                      <% }); %>
-                    </select>
-                    <button type="submit" class="btn-primary">Save</button>
-                  </form>
+                  <% const nextStatuses = orderStatusTransitions[order.orderStatus] || []; %>
+                  <% if (nextStatuses.length > 0) { %>
+                    <form class="quick-order-action order-status-form" data-order-id="<%= order._id %>">
+                      <select name="status" aria-label="Next order status" required>
+                        <option value="" selected disabled>Choose next status</option>
+                        <% nextStatuses.forEach(function(status) { %>
+                          <option value="<%= status %>"><%= orderStatusLabels[status] %></option>
+                        <% }); %>
+                      </select>
+                      <button type="submit" class="btn-primary">Update</button>
+                    </form>
+                  <% } else { %>
+                    <small>Final status</small>
+                  <% } %>
                 </td>
               </tr>
             <% }); %>
@@ -125,6 +132,16 @@
       OUT_FOR_DELIVERY: "Out for delivery",
       CANCELLED: "Cancelled",
       DELIVERED: "Delivered",
+    };
+    const orderStatusTransitions = {
+      PENDING: ["CONFIRMED", "CANCELLED"],
+      PROCESS: ["CONFIRMED"],
+      CONFIRMED: ["BAKING", "CANCELLED"],
+      BAKING: ["DECORATING", "CANCELLED"],
+      DECORATING: ["OUT_FOR_DELIVERY", "CANCELLED"],
+      OUT_FOR_DELIVERY: ["DELIVERED"],
+      DELIVERED: [],
+      CANCELLED: [],
     };
 
     document.querySelectorAll(".order-status-form").forEach(function(form) {
@@ -149,6 +166,26 @@
           const badge = document.getElementById(`status-${orderId}`);
           badge.textContent = orderStatusLabels[result.data.orderStatus] || result.data.orderStatus;
           badge.className = `status-badge status-${result.data.orderStatus.toLowerCase().replaceAll("_", "-")}`;
+          const nextStatuses = orderStatusTransitions[result.data.orderStatus] || [];
+          select.replaceChildren();
+          if (nextStatuses.length > 0) {
+            const placeholder = document.createElement("option");
+            placeholder.value = "";
+            placeholder.textContent = "Choose next status";
+            placeholder.disabled = true;
+            placeholder.selected = true;
+            select.append(placeholder);
+            nextStatuses.forEach(function(status) {
+              const option = document.createElement("option");
+              option.value = status;
+              option.textContent = orderStatusLabels[status] || status;
+              select.append(option);
+            });
+          } else {
+            select.disabled = true;
+            button.disabled = true;
+            button.textContent = "Final status";
+          }
           const history = document.getElementById(`history-${orderId}`);
           const latestEntry = result.data.statusHistory?.at(-1);
           if (history && latestEntry) {
@@ -170,8 +207,10 @@
           message.className = "order-message order-message-error";
           message.hidden = false;
         } finally {
-          button.disabled = false;
-          button.textContent = "Save";
+          if (!select.disabled) {
+            button.disabled = false;
+            button.textContent = "Update";
+          }
         }
       });
     });

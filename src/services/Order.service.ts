@@ -9,6 +9,9 @@ import {
 import { OrderStatus } from "../libs/enums/order.enum";
 import CakePricingService from "./CakePricing.service";
 import DeliverySlotService from "./DeliverySlot.service";
+import orderTrackingService, {
+  OrderTrackingSnapshot,
+} from "./OrderTracking.service";
 
 type CreateOrderItemInput = {
   productId?: unknown;
@@ -75,6 +78,7 @@ class OrderService {
         .catch((error: unknown) => {
           console.error("Unable to release cancelled order delivery slot:", error);
         });
+      orderTrackingService.publish(order);
       return order;
     }
 
@@ -99,7 +103,6 @@ class OrderService {
     adminId: string,
   ): Promise<any> {
     const allowedStatuses: OrderStatus[] = [
-      OrderStatus.PENDING,
       OrderStatus.CONFIRMED,
       OrderStatus.BAKING,
       OrderStatus.DECORATING,
@@ -117,8 +120,29 @@ class OrderService {
       throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_ORDER_STATUS);
     }
 
-    const order = await OrderModel.findByIdAndUpdate(
-      id,
+    const previousStatuses: Partial<Record<OrderStatus, OrderStatus[]>> = {
+      [OrderStatus.CONFIRMED]: [
+        OrderStatus.PENDING,
+        OrderStatus.LEGACY_PROCESS,
+      ],
+      [OrderStatus.BAKING]: [OrderStatus.CONFIRMED],
+      [OrderStatus.DECORATING]: [OrderStatus.BAKING],
+      [OrderStatus.OUT_FOR_DELIVERY]: [OrderStatus.DECORATING],
+      [OrderStatus.DELIVERED]: [OrderStatus.OUT_FOR_DELIVERY],
+      [OrderStatus.CANCELLED]: [
+        OrderStatus.PENDING,
+        OrderStatus.CONFIRMED,
+        OrderStatus.BAKING,
+        OrderStatus.DECORATING,
+      ],
+    };
+    const permittedPreviousStatuses = previousStatuses[status as OrderStatus];
+    if (!permittedPreviousStatuses) {
+      throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_ORDER_STATUS);
+    }
+
+    const order = await OrderModel.findOneAndUpdate(
+      { _id: id, orderStatus: { $in: permittedPreviousStatuses } },
       {
         $set: { orderStatus: status },
         $push: {
@@ -136,10 +160,41 @@ class OrderService {
       .exec();
 
     if (!order) {
+      const exists = await OrderModel.exists({ _id: id }).exec();
+      if (!exists) {
+        throw new Errors(HttpCode.NOT_FOUND, Message.ORDER_NOT_FOUND);
+      }
+      throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_ORDER_STATUS);
+    }
+
+    if (status === OrderStatus.CANCELLED) {
+      await deliverySlotService
+        .releaseSlot(order.deliverySlotId)
+        .catch((error: unknown) => {
+          console.error("Unable to release cancelled order delivery slot:", error);
+        });
+    }
+    orderTrackingService.publish(order);
+
+    return order;
+  }
+
+  public async getMyOrderTracking(
+    memberId: string,
+    orderId: string,
+  ): Promise<OrderTrackingSnapshot> {
+    if (!mongoose.isValidObjectId(memberId) || !mongoose.isValidObjectId(orderId)) {
       throw new Errors(HttpCode.NOT_FOUND, Message.ORDER_NOT_FOUND);
     }
 
-    return order;
+    const order = await OrderModel.findOne({ _id: orderId, memberId })
+      .lean()
+      .exec();
+    if (!order) {
+      throw new Errors(HttpCode.NOT_FOUND, Message.ORDER_NOT_FOUND);
+    }
+
+    return orderTrackingService.toSnapshot(order);
   }
 
   public async getMyOrders(memberId: string): Promise<any[]> {
