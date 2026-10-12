@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { OrderStatus } from "../libs/enums/order.enum";
+import { CakeConfigurationSnapshotSchema } from "./CakeConfiguration.schema";
 
 const OrderStatusHistorySchema = new Schema(
   {
@@ -56,6 +57,10 @@ const OrderItemSchema = new Schema(
       type: Number,
       required: true,
       min: 0,
+    },
+    cakeConfiguration: {
+      type: CakeConfigurationSnapshotSchema,
+      default: undefined,
     },
   },
   { _id: false },
