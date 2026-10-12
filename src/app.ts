@@ -9,6 +9,7 @@ import cors from "cors";
 import orderRouter from "./routes/Order.route";
 import quickOrderRouter from "./routes/QuickOrder.route";
 import deliverySlotRouter from "./routes/DeliverySlot.route";
+import cakeOptionRouter from "./routes/CakeOption.route";
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use("/members", memberRouter);
 app.use("/orders", orderRouter);
 app.use("/quick-orders", quickOrderRouter);
 app.use("/delivery-slots", deliverySlotRouter);
+app.use("/cake-options", cakeOptionRouter);
 
 
 export default app;

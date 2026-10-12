@@ -3,6 +3,16 @@ import Errors, { HttpCode, Message } from "../libs/Errors";
 import CakeOptionModel from "../schema/CakeOption.model";
 
 class CakeOptionService {
+  public async getActiveOptions(): Promise<any[]> {
+    return CakeOptionModel.find({ isActive: true })
+      .select(
+        "optionType code name description priceModifier previewImage previewColor sortOrder",
+      )
+      .sort({ optionType: 1, sortOrder: 1, name: 1 })
+      .lean()
+      .exec();
+  }
+
   public async getOptions(): Promise<any[]> {
     return CakeOptionModel.find()
       .sort({ optionType: 1, sortOrder: 1, name: 1 })
