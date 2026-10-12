@@ -5,7 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:dev": "nodemon",
-    "migrate:order-statuses": "ts-node src/migrations/migrate-order-statuses.ts"
+    "migrate:order-statuses": "ts-node src/migrations/migrate-order-statuses.ts",
+    "backfill:order-status-history": "ts-node src/migrations/backfill-order-status-history.ts"
   },
   "keywords": [],
   "author": "Leo",

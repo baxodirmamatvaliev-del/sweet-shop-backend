@@ -20,7 +20,7 @@ const OrderStatusHistorySchema = new Schema(
     },
     source: {
       type: String,
-      enum: ["CUSTOMER", "ADMIN"],
+      enum: ["CUSTOMER", "ADMIN", "SYSTEM"],
       required: true,
     },
   },
