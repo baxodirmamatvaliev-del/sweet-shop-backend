@@ -1,3 +1,4 @@
+// Retained to read historical order snapshots; cake creation has been retired.
 import { Schema } from "mongoose";
 import { CakeOptionType } from "../libs/enums/cake.enum";
 

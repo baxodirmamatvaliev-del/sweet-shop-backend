@@ -7,25 +7,16 @@ import {
   ProductStatus,
 } from "../libs/enums/product.enum";
 import { OrderStatus } from "../libs/enums/order.enum";
-import CakePricingService from "./CakePricing.service";
 import DeliverySlotService from "./DeliverySlot.service";
 import orderTrackingService, {
   OrderTrackingSnapshot,
 } from "./OrderTracking.service";
-import AiCakeDesignService from "./AiCakeDesign.service";
 
 type CreateOrderItemInput = {
   productId?: unknown;
   quantity?: unknown;
   cakeConfiguration?: unknown;
   aiDesignId?: unknown;
-};
-
-type NormalizedOrderItem = {
-  productId: string;
-  quantity: number;
-  cakeConfiguration?: unknown;
-  aiDesignId?: string;
 };
 
 type CreateOrderInput = {
@@ -41,9 +32,7 @@ const DELIVERY_FEE = 3_000;
 
 const roundMoney = (amount: number): number => Math.round(amount);
 
-const cakePricingService = new CakePricingService();
 const deliverySlotService = new DeliverySlotService();
-const aiCakeDesignService = new AiCakeDesignService();
 
 class OrderService {
   public async cancelMyOrder(memberId: string, orderId: string): Promise<any> {
@@ -220,7 +209,6 @@ class OrderService {
 
     const requestedItems = input.items as CreateOrderItemInput[];
     const quantities = new Map<string, number>();
-    const customizedItems: NormalizedOrderItem[] = [];
 
     for (const item of requestedItems) {
       const productId = typeof item.productId === "string" ? item.productId : "";
@@ -230,41 +218,22 @@ class OrderService {
         throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_ORDER);
       }
 
-      if (item.cakeConfiguration !== undefined) {
-        if (
-          item.aiDesignId !== undefined &&
-          (typeof item.aiDesignId !== "string" ||
-            !mongoose.isValidObjectId(item.aiDesignId))
-        ) {
-          throw new Errors(HttpCode.BAD_REQUEST, Message.AI_DESIGN_NOT_FOUND);
-        }
-        customizedItems.push({
-          productId,
-          quantity,
-          cakeConfiguration: item.cakeConfiguration,
-          ...(typeof item.aiDesignId === "string"
-            ? { aiDesignId: item.aiDesignId }
-            : {}),
-        });
-      } else {
-        if (item.aiDesignId !== undefined) {
-          throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_ORDER);
-        }
-        quantities.set(productId, (quantities.get(productId) ?? 0) + quantity);
+      // Retired cake payloads must not become ordinary, incorrectly priced orders.
+      if (item.cakeConfiguration !== undefined || item.aiDesignId !== undefined) {
+        throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_ORDER);
       }
+      quantities.set(productId, (quantities.get(productId) ?? 0) + quantity);
     }
 
-    const normalizedItems: NormalizedOrderItem[] = [
-      ...[...quantities].map(([productId, quantity]) => ({
-        productId,
-        quantity,
-      })),
-      ...customizedItems,
-    ];
+    const normalizedItems = [...quantities].map(([productId, quantity]) => ({
+      productId,
+      quantity,
+    }));
     const productIds = [...new Set(normalizedItems.map((item) => item.productId))];
     const products = await ProductModel.find({
       _id: { $in: productIds },
       productStatus: ProductStatus.PROCESS,
+      productCategory: { $ne: ProductCategory.BIRTHDAY_CAKE },
     }).exec();
 
     if (products.length !== productIds.length) {
@@ -274,63 +243,21 @@ class OrderService {
     const productsById = new Map(
       products.map((product) => [product._id.toString(), product]),
     );
-    const orderItems = await Promise.all(
-      normalizedItems.map(async (item) => {
-        const product = productsById.get(item.productId);
-        if (!product) {
-          throw new Errors(HttpCode.BAD_REQUEST, Message.PRODUCT_NOT_AVAILABLE);
-        }
-
-        const basePrice = roundMoney(product.productPrice);
-
-        if (item.cakeConfiguration !== undefined) {
-          if (product.productCategory !== ProductCategory.BIRTHDAY_CAKE) {
-            throw new Errors(
-              HttpCode.BAD_REQUEST,
-              Message.INVALID_CAKE_CONFIGURATION,
-            );
-          }
-
-          const cakeConfiguration = await cakePricingService.calculate(
-            basePrice,
-            item.cakeConfiguration,
-          );
-          const aiDesign = item.aiDesignId
-            ? await aiCakeDesignService.getOwnedDesign(memberId, item.aiDesignId)
-            : null;
-
-          return {
-            productId: product._id,
-            productName: product.productName,
-            productImage: product.productImage ?? "",
-            productPrice: cakeConfiguration.finalPrice,
-            quantity: item.quantity,
-            itemTotal: roundMoney(
-              cakeConfiguration.finalPrice * item.quantity,
-            ),
-            cakeConfiguration,
-            ...(aiDesign
-              ? {
-                  aiDesign: {
-                    designId: aiDesign._id,
-                    prompt: aiDesign.prompt,
-                    imageUrl: aiDesign.imageUrl,
-                  },
-                }
-              : {}),
-          };
-        }
-
-        return {
-          productId: product._id,
-          productName: product.productName,
-          productImage: product.productImage ?? "",
-          productPrice: basePrice,
-          quantity: item.quantity,
-          itemTotal: roundMoney(basePrice * item.quantity),
-        };
-      }),
-    );
+    const orderItems = normalizedItems.map((item) => {
+      const product = productsById.get(item.productId);
+      if (!product) {
+        throw new Errors(HttpCode.BAD_REQUEST, Message.PRODUCT_NOT_AVAILABLE);
+      }
+      const basePrice = roundMoney(product.productPrice);
+      return {
+        productId: product._id,
+        productName: product.productName,
+        productImage: product.productImage ?? "",
+        productPrice: basePrice,
+        quantity: item.quantity,
+        itemTotal: roundMoney(basePrice * item.quantity),
+      };
+    });
 
     const subtotal = roundMoney(
       orderItems.reduce((sum, item) => sum + item.itemTotal, 0),

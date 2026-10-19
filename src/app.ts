@@ -9,8 +9,6 @@ import cors from "cors";
 import orderRouter from "./routes/Order.route";
 import quickOrderRouter from "./routes/QuickOrder.route";
 import deliverySlotRouter from "./routes/DeliverySlot.route";
-import cakeOptionRouter from "./routes/CakeOption.route";
-import aiCakeDesignRouter from "./routes/AiCakeDesign.route";
 
 const app = express();
 const clientOrigins = (
@@ -49,7 +47,7 @@ app.use(express.static("public"));
 
 
 app.get("/", (req, res) => {
-  res.send("Sweet Shop backend is running! 🧁");
+  res.send("Morrow Coffee backend is running.");
 });
 
 
@@ -58,8 +56,6 @@ app.use("/members", memberRouter);
 app.use("/orders", orderRouter);
 app.use("/quick-orders", quickOrderRouter);
 app.use("/delivery-slots", deliverySlotRouter);
-app.use("/cake-options", cakeOptionRouter);
-app.use("/ai-cake-designs", aiCakeDesignRouter);
 
 app.use(
   (

@@ -8,8 +8,6 @@ import path from "path";
 import QuickOrderService from "../services/QuickOrder.service";
 import OrderService from "../services/Order.service";
 import AdminAnalyticsService from "../services/AdminAnalytics.service";
-import CakeOptionService from "../services/CakeOption.service";
-import { CakeOptionType } from "../libs/enums/cake.enum";
 import { ProductCategory, ProductTemperature, coffeeShopCategories } from "../libs/enums/product.enum";
 import DeliverySlotService from "../services/DeliverySlot.service";
 
@@ -19,7 +17,6 @@ const productService = new ProductService();
 const quickOrderService = new QuickOrderService();
 const orderService = new OrderService();
 const adminAnalyticsService = new AdminAnalyticsService();
-const cakeOptionService = new CakeOptionService();
 const deliverySlotService = new DeliverySlotService();
 
 const parseProductInput = (body: any) => {
@@ -61,40 +58,6 @@ const parseProductInput = (body: any) => {
     trackInventory,
     inventoryQuantity,
     lowStockThreshold,
-  };
-};
-
-const parseCakeOptionInput = (body: any) => {
-  const optionType = String(body.optionType ?? "");
-  const code = String(body.code ?? "").trim().toUpperCase();
-  const name = String(body.name ?? "").trim();
-  const description = String(body.description ?? "").trim();
-  const priceModifier = Number(body.priceModifier ?? 0);
-  const previewImage = String(body.previewImage ?? "").trim();
-  const previewColor = String(body.previewColor ?? "").trim();
-  const sortOrder = Number(body.sortOrder ?? 0);
-
-  if (
-    !Object.values(CakeOptionType).includes(optionType as CakeOptionType) ||
-    !/^[A-Z0-9_-]{2,40}$/.test(code) ||
-    !name ||
-    !Number.isFinite(priceModifier) ||
-    priceModifier < 0 ||
-    !Number.isInteger(sortOrder) ||
-    sortOrder < 0
-  ) {
-    throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_CAKE_OPTION);
-  }
-
-  return {
-    optionType,
-    code,
-    name,
-    description,
-    priceModifier,
-    previewImage,
-    previewColor,
-    sortOrder,
   };
 };
 
@@ -215,69 +178,6 @@ adminController.updateDeliverySlotStatus = async (
     console.error("ERROR, updateDeliverySlotStatus", err);
     return res.status(err.code ?? 400).send(
       err.message ?? Message.INVALID_DELIVERY_SLOT,
-    );
-  }
-};
-
-adminController.getCakeOptionsPage = async (_req: Request, res: Response) => {
-  try {
-    const options = await cakeOptionService.getOptions();
-    return res.render("cake-options", {
-      options,
-      optionTypes: Object.values(CakeOptionType),
-      createError: null,
-      formData: {},
-    });
-  } catch (err) {
-    console.error("ERROR, getCakeOptionsPage", err);
-    return res.status(500).send("Unable to load cake options.");
-  }
-};
-
-adminController.createCakeOption = async (req: Request, res: Response) => {
-  try {
-    await cakeOptionService.createOption(parseCakeOptionInput(req.body));
-    return res.redirect("/admin/cake-options");
-  } catch (err: any) {
-    const options = await cakeOptionService.getOptions().catch(() => []);
-    return res.status(err.code ?? 400).render("cake-options", {
-      options,
-      optionTypes: Object.values(CakeOptionType),
-      createError: err.message ?? Message.INVALID_CAKE_OPTION,
-      formData: req.body,
-    });
-  }
-};
-
-adminController.updateCakeOption = async (req: Request, res: Response) => {
-  try {
-    await cakeOptionService.updateOption(
-      req.params.id as string,
-      parseCakeOptionInput(req.body),
-    );
-    return res.redirect("/admin/cake-options");
-  } catch (err: any) {
-    console.error("ERROR, updateCakeOption", err);
-    return res.status(err.code ?? 400).send(
-      err.message ?? Message.INVALID_CAKE_OPTION,
-    );
-  }
-};
-
-adminController.updateCakeOptionStatus = async (
-  req: Request,
-  res: Response,
-) => {
-  try {
-    await cakeOptionService.updateActiveStatus(
-      req.params.id as string,
-      req.body.isActive === "true",
-    );
-    return res.redirect("/admin/cake-options");
-  } catch (err: any) {
-    console.error("ERROR, updateCakeOptionStatus", err);
-    return res.status(err.code ?? 400).send(
-      err.message ?? Message.INVALID_CAKE_OPTION,
     );
   }
 };
