@@ -56,7 +56,7 @@ export type CakeConfigurationSnapshot = {
   finalPrice: number;
 };
 
-const roundMoney = (amount: number): number => Math.round(amount * 100) / 100;
+const roundMoney = (amount: number): number => Math.round(amount);
 
 class CakePricingService {
   public async calculate(

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sweet Shop Admin - Dashboard</title>
+  <title>Morrow Coffee Admin - Dashboard</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/css/admin.css">
 </head>
@@ -11,9 +11,9 @@
   <%- include('includes/header') %>
 
   <%
-    const formatMoney = (value) => new Intl.NumberFormat('en-US', {
+    const formatMoney = (value) => new Intl.NumberFormat('ko-KR', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'KRW',
     }).format(value);
     const maxRevenue = Math.max(...overview.dailyRevenue.map((day) => day.revenue), 1);
     const activeOrders = ['PENDING', 'CONFIRMED', 'BAKING', 'DECORATING', 'OUT_FOR_DELIVERY']
@@ -21,8 +21,8 @@
     const statusLabels = {
       PENDING: 'Pending',
       CONFIRMED: 'Confirmed',
-      BAKING: 'Baking',
-      DECORATING: 'Decorating',
+      BAKING: 'Preparing',
+      DECORATING: 'Ready to dispatch',
       OUT_FOR_DELIVERY: 'Out for delivery',
       DELIVERED: 'Delivered',
       CANCELLED: 'Cancelled',

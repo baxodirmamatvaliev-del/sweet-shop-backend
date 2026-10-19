@@ -36,13 +36,10 @@ type CreateOrderInput = {
   items?: unknown;
 };
 
-const FREE_DELIVERY_LIMIT = 100;
-const DELIVERY_FEE = 5;
+const FREE_DELIVERY_LIMIT = 20_000;
+const DELIVERY_FEE = 3_000;
 
-const roundMoney = (amount: number): number => Math.round(amount * 100) / 100;
-
-const convertLegacyPriceToUSD = (price: number): number =>
-  price >= 1000 ? price / 1000 : price;
+const roundMoney = (amount: number): number => Math.round(amount);
 
 const cakePricingService = new CakePricingService();
 const deliverySlotService = new DeliverySlotService();
@@ -284,9 +281,7 @@ class OrderService {
           throw new Errors(HttpCode.BAD_REQUEST, Message.PRODUCT_NOT_AVAILABLE);
         }
 
-        const basePrice = roundMoney(
-          convertLegacyPriceToUSD(product.productPrice),
-        );
+        const basePrice = roundMoney(product.productPrice);
 
         if (item.cakeConfiguration !== undefined) {
           if (product.productCategory !== ProductCategory.BIRTHDAY_CAKE) {

@@ -2,26 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sweet Shop Admin - Products</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Morrow Coffee Admin - Products</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body class="admin-page">
  <%- include('includes/header') %>
 
-  <!-- <div class="floating-sweet">🧁</div> -->
-   <div class="floating-sweet fs4">🍪</div>
-  <div class="floating-sweet fs2">🍰</div>
-  <div class="floating-sweet fs3">🎂</div>
-  <div class="floating-sweet fs4">🍪</div>
-  <div class="floating-sweet fs2">🍰</div>
-
   <main class="container products-page">
     <div class="page-heading">
       <div>
         <p class="eyebrow">Admin panel</p>
-        <h1>Products</h1>
-        <p class="page-description">View store products and manage their availability.</p>
+        <h1>Coffee menu</h1>
+        <p class="page-description">Manage drinks, desserts, KRW prices, and availability.</p>
       </div>
       <button class="btn-primary add-product-button" type="button" onclick="toggleForm()">+ Add product</button>
     </div>
@@ -42,11 +36,14 @@
         </tr>
       </thead>
       <tbody>
+        <% if (!products.length) { %>
+          <tr><td colspan="8" class="menu-empty">Your coffee menu is empty. Add your first drink to get started.</td></tr>
+        <% } %>
         <% products.forEach(function(product) { %>
           <tr>
             <td><%= product.productName %></td>
             <td><%= product.productCategory %></td>
-            <td><%= product.productPrice %> UZS</td>
+            <td><%= new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(product.productPrice) %></td>
             <td><%= product.productViews %></td>
             <td>
               <% if (product.trackInventory) { %>
@@ -125,16 +122,14 @@
         <label for="editProductName">Name:</label>
         <input id="editProductName" type="text" name="productName" required>
 
-        <label for="editProductPrice">Price:</label>
-        <input id="editProductPrice" type="number" name="productPrice" min="0" required>
+        <label for="editProductPrice">Price (₩ KRW):</label>
+        <input id="editProductPrice" type="number" name="productPrice" min="0" step="1" required>
 
         <label for="editProductCategory">Category:</label>
         <select id="editProductCategory" name="productCategory" required>
-          <option value="CUPCAKE">CUPCAKE</option>
-          <option value="CAKE">CAKE</option>
-          <option value="BIRTHDAY_CAKE">BIRTHDAY CAKE</option>
-          <option value="COOKIE">COOKIE</option>
-          <option value="OTHER">OTHER</option>
+          <% categories.forEach(function(category) { %>
+            <option value="<%= category %>" <%= formData.productCategory === category ? 'selected' : '' %>><%= category.charAt(0) + category.slice(1).toLowerCase() %></option>
+          <% }); %>
         </select>
 
         <label for="editProductDesc">Description:</label>
@@ -176,16 +171,14 @@
         <label>Name:</label>
         <input type="text" name="productName" value="<%= formData.productName || '' %>" required>
 
-        <label>Price:</label>
-        <input type="number" name="productPrice" value="<%= formData.productPrice || '' %>" required>
+        <label>Price (₩ KRW):</label>
+        <input type="number" name="productPrice" min="0" step="1" value="<%= formData.productPrice || '' %>" required>
 
         <label>Category:</label>
         <select name="productCategory">
-          <option value="CUPCAKE" <%= formData.productCategory === 'CUPCAKE' ? 'selected' : '' %>>CUPCAKE</option>
-          <option value="CAKE" <%= formData.productCategory === 'CAKE' ? 'selected' : '' %>>CAKE</option>
-          <option value="BIRTHDAY_CAKE" <%= formData.productCategory === 'BIRTHDAY_CAKE' ? 'selected' : '' %>>BIRTHDAY CAKE</option>
-          <option value="COOKIE" <%= formData.productCategory === 'COOKIE' ? 'selected' : '' %>>COOKIE</option>
-          <option value="OTHER" <%= formData.productCategory === 'OTHER' ? 'selected' : '' %>>OTHER</option>
+          <% categories.forEach(function(category) { %>
+            <option value="<%= category %>" <%= formData.productCategory === category ? 'selected' : '' %>><%= category.charAt(0) + category.slice(1).toLowerCase() %></option>
+          <% }); %>
         </select>
 
         <label>Description:</label>

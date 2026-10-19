@@ -9,7 +9,7 @@
 
 body {
   margin: 0;
-  background: #fff8f1;
+  background: #fff8e6;
 }
 
 .signup-page {
@@ -26,8 +26,8 @@ body {
   justify-content: space-between;
   overflow: hidden;
   padding: clamp(32px, 5vw, 72px);
-  background: linear-gradient(145deg, #6f350d, #ae601e 58%, #e7a05a);
-  color: #fff9f3;
+  background: #ffce32;
+  color: #202020;
 }
 
 .signup-intro::before,

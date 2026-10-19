@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="380" height="97" viewBox="0 0 380 97">
+  <g fill="#1f1f1f" text-anchor="middle">
+    <text x="76" y="65" font-family="Impact, 'Arial Black', sans-serif" font-size="61" font-weight="900" textLength="150" lengthAdjust="spacingAndGlyphs">MORROW</text>
+    <g transform="rotate(12 190 42)">
+      <path d="M168 25h44l-5 43h-34z"/>
+      <path d="M163 17h54v8h-54zm7-9h40l4 7h-48z"/>
+      <path d="M177 53V34h5l8 10 8-10h5v19h-6V43l-7 9-7-9v10z" fill="#fffdf9"/>
+    </g>
+    <text x="304" y="65" font-family="Impact, 'Arial Black', sans-serif" font-size="61" font-weight="900" textLength="150" lengthAdjust="spacingAndGlyphs">COFFEE</text>
+    <text x="190" y="91" font-family="Arial, sans-serif" font-size="17" font-weight="800" letter-spacing="4">BIG SIZE · 2 SHOT</text>
+  </g>
+</svg>

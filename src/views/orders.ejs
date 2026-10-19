@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sweet Shop Admin - Orders</title>
+  <title>Morrow Coffee Admin - Orders</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/css/admin.css">
 </head>
@@ -14,8 +14,8 @@
     const orderStatusLabels = {
       PENDING: 'Pending',
       CONFIRMED: 'Confirmed',
-      BAKING: 'Baking',
-      DECORATING: 'Decorating',
+      BAKING: 'Preparing',
+      DECORATING: 'Ready to dispatch',
       OUT_FOR_DELIVERY: 'Out for delivery',
       DELIVERED: 'Delivered',
       CANCELLED: 'Cancelled',
@@ -80,7 +80,7 @@
                     <div><%= item.productName %> × <%= item.quantity %></div>
                   <% }); %>
                 </td>
-                <td>$<%= Number(order.total).toFixed(2) %></td>
+                <td><%= new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(order.total) %></td>
                 <td>
                   <span id="status-<%= order._id %>" class="status-badge status-<%= order.orderStatus.toLowerCase().replaceAll('_', '-') %>">
                     <%= orderStatusLabels[order.orderStatus] || order.orderStatus %>
@@ -127,8 +127,8 @@
     const orderStatusLabels = {
       PENDING: "Pending",
       CONFIRMED: "Confirmed",
-      BAKING: "Baking",
-      DECORATING: "Decorating",
+      BAKING: "Preparing",
+      DECORATING: "Ready to dispatch",
       OUT_FOR_DELIVERY: "Out for delivery",
       CANCELLED: "Cancelled",
       DELIVERED: "Delivered",

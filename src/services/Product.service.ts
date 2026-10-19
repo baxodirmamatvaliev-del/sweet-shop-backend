@@ -1,3 +1,4 @@
+import { ProductStatus } from "../libs/enums/product.enum";
 import ProductModel from "../schema/Product.model";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { shapeIntoMongooseObjectId } from "../libs/config";
@@ -11,7 +12,7 @@ class ProductService {
 
   public async getProducts(): Promise<any[]> { 
 
-    const result = await this.productModel.find({}).exec();
+    const result = await this.productModel.find({ productStatus: { $ne: ProductStatus.DELETE } }).exec();
 
     if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
 

@@ -10,7 +10,7 @@ import OrderService from "../services/Order.service";
 import AdminAnalyticsService from "../services/AdminAnalytics.service";
 import CakeOptionService from "../services/CakeOption.service";
 import { CakeOptionType } from "../libs/enums/cake.enum";
-import { ProductCategory } from "../libs/enums/product.enum";
+import { ProductCategory, coffeeShopCategories } from "../libs/enums/product.enum";
 import DeliverySlotService from "../services/DeliverySlot.service";
 
 const memberService = new MemberService();
@@ -292,7 +292,7 @@ adminController.updateQuickOrderStatus = async (req: Request, res: Response) => 
 adminController.getProductsPage = async (req: Request, res: Response) => {
   try {
     const products = await productService.getProducts();
-    res.render("products", { products, createError: null, formData: {} });
+    res.render("products", { products, categories: coffeeShopCategories, createError: null, formData: {} });
   } catch (err) {
     console.error("ERROR, getProductsPage", err);
     throw new Errors(HttpCode.BAD_REQUEST, Message.ERROR_SERVICE);
@@ -387,6 +387,7 @@ adminController.processCreateProduct = async (req: Request, res: Response) => {
 
     return res.status(400).render("products", {
       products,
+      categories: coffeeShopCategories,
       createError,
       formData: req.body,
     });
