@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { ProductCategory, ProductStatus } from "../libs/enums/product.enum";
+import { ProductCategory, ProductStatus, ProductTemperature } from "../libs/enums/product.enum";
 
 const ProductSchema = new Schema(
   {
@@ -7,6 +7,12 @@ const ProductSchema = new Schema(
       type: String,
       enum: ProductCategory,
       required: true,
+    },
+
+    productTemperature: {
+      type: String,
+      enum: [...Object.values(ProductTemperature), null],
+      default: null,
     },
 
     productStatus: {

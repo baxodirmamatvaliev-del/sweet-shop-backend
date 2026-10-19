@@ -26,3 +26,8 @@ export const coffeeShopCategories: ProductCategory[] = [
   ProductCategory.DESSERT,
   ProductCategory.OTHER,
 ];
+
+export enum ProductTemperature {
+  ICE = "ICE",
+  HOT = "HOT",
+}

@@ -27,6 +27,7 @@
         <tr>
           <th>Name</th>
           <th>Category</th>
+          <th>Temperature</th>
           <th>Price</th>
           <th>Views</th>
           <th>Inventory</th>
@@ -37,12 +38,13 @@
       </thead>
       <tbody>
         <% if (!products.length) { %>
-          <tr><td colspan="8" class="menu-empty">Your coffee menu is empty. Add your first drink to get started.</td></tr>
+          <tr><td colspan="9" class="menu-empty">Your coffee menu is empty. Add your first drink to get started.</td></tr>
         <% } %>
         <% products.forEach(function(product) { %>
           <tr>
             <td><%= product.productName %></td>
             <td><%= product.productCategory %></td>
+            <td><%= product.productTemperature || "—" %></td>
             <td><%= new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(product.productPrice) %></td>
             <td><%= product.productViews %></td>
             <td>
@@ -78,6 +80,7 @@
                 data-product-name="<%= product.productName %>"
                 data-product-price="<%= product.productPrice %>"
                 data-product-category="<%= product.productCategory %>"
+                data-product-temperature="<%= product.productTemperature || '' %>"
                 data-product-desc="<%= product.productDesc || '' %>"
                 data-product-image="<%= product.productImage || '' %>"
                 data-product-track-inventory="<%= Boolean(product.trackInventory) %>"
@@ -132,6 +135,13 @@
           <% }); %>
         </select>
 
+        <label for="editProductTemperature">Temperature:</label>
+        <select id="editProductTemperature" name="productTemperature">
+          <option value="">Not specified / Not applicable</option>
+          <option value="ICE" <%= formData.productTemperature === 'ICE' ? 'selected' : '' %>>ICE — Cold</option>
+          <option value="HOT" <%= formData.productTemperature === 'HOT' ? 'selected' : '' %>>HOT — Hot</option>
+        </select>
+
         <label for="editProductDesc">Description:</label>
         <textarea id="editProductDesc" name="productDesc"></textarea>
 
@@ -179,6 +189,13 @@
           <% categories.forEach(function(category) { %>
             <option value="<%= category %>" <%= formData.productCategory === category ? 'selected' : '' %>><%= category.charAt(0) + category.slice(1).toLowerCase() %></option>
           <% }); %>
+        </select>
+
+        <label for="createProductTemperature">Temperature:</label>
+        <select id="createProductTemperature" name="productTemperature">
+          <option value="">Not specified / Not applicable</option>
+          <option value="ICE" <%= formData.productTemperature === 'ICE' ? 'selected' : '' %>>ICE — Cold</option>
+          <option value="HOT" <%= formData.productTemperature === 'HOT' ? 'selected' : '' %>>HOT — Hot</option>
         </select>
 
         <label>Description:</label>
@@ -241,6 +258,7 @@
       document.getElementById("editProductName").value = button.dataset.productName;
       document.getElementById("editProductPrice").value = button.dataset.productPrice;
       document.getElementById("editProductCategory").value = button.dataset.productCategory;
+      document.getElementById("editProductTemperature").value = button.dataset.productTemperature || "";
       document.getElementById("editProductDesc").value = button.dataset.productDesc;
       document.getElementById("editTrackInventory").checked = button.dataset.productTrackInventory === "true";
       document.getElementById("editInventoryQuantity").value = button.dataset.productInventoryQuantity;

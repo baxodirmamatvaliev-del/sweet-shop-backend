@@ -10,7 +10,7 @@ import OrderService from "../services/Order.service";
 import AdminAnalyticsService from "../services/AdminAnalytics.service";
 import CakeOptionService from "../services/CakeOption.service";
 import { CakeOptionType } from "../libs/enums/cake.enum";
-import { ProductCategory, coffeeShopCategories } from "../libs/enums/product.enum";
+import { ProductCategory, ProductTemperature, coffeeShopCategories } from "../libs/enums/product.enum";
 import DeliverySlotService from "../services/DeliverySlot.service";
 
 const memberService = new MemberService();
@@ -26,6 +26,7 @@ const parseProductInput = (body: any) => {
   const productName = String(body.productName ?? "").trim();
   const productPrice = Number(body.productPrice);
   const productCategory = String(body.productCategory ?? "");
+  const productTemperature = String(body.productTemperature ?? "").trim() || null;
   const productDesc = String(body.productDesc ?? "").trim();
   const trackInventory =
     body.trackInventory === true ||
@@ -41,6 +42,8 @@ const parseProductInput = (body: any) => {
     !Object.values(ProductCategory).includes(
       productCategory as ProductCategory,
     ) ||
+    (productTemperature !== null &&
+      !Object.values(ProductTemperature).includes(productTemperature as ProductTemperature)) ||
     !Number.isInteger(inventoryQuantity) ||
     inventoryQuantity < 0 ||
     !Number.isInteger(lowStockThreshold) ||
@@ -53,6 +56,7 @@ const parseProductInput = (body: any) => {
     productName,
     productPrice,
     productCategory,
+    productTemperature,
     productDesc,
     trackInventory,
     inventoryQuantity,
